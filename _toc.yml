@@ -1,0 +1,21 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: 0.Course_overview
+chapters:
+- file: 1.ProbabilityParadigms
+  sections:
+    - file: 1.ProbabilityRules
+    - file: 1.BayesTheorem
+    - file: 1.Distributions
+    - file: 1.Quize(Probability)
+    - file: 1.Quize(Bayes)
+ 
+- file:  2.StatisticalInference
+  sections:
+    - file: 2.FrequentistInference
+    - file: 2.BayesianInference
+    - file: 2.CDF
+    - file: 2.Quize(General)
+    - file: 2.Quize(BayesianInference) 
