@@ -19,3 +19,11 @@ chapters:
     - file: 2.CDF
     - file: 2.Quize(General)
     - file: 2.Quize(BayesianInference) 
+
+- file: 3.Conjugates
+  sections:
+    - file: 3.ConjugatePriors
+    - file: 3.PosteriorPredictiveDistribution
+    - file: 3.PriorPredictiveDistribution
+    - file: 3.ConjugatesDistributionsToDo.ipynb
+
