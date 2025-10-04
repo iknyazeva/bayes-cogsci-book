@@ -22,8 +22,10 @@ chapters:
 
 - file: 3.Conjugates
   sections:
+    - file: 3.LikelihoodExmpl.ipynb
     - file: 3.ConjugatePriors
     - file: 3.PosteriorPredictiveDistribution
     - file: 3.PriorPredictiveDistribution
     - file: 3.ConjugatesDistributionsToDo.ipynb
+    - file: 3.DiscreteModelQuize.md
 
