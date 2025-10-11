@@ -29,3 +29,12 @@ chapters:
     - file: 3.ConjugatesDistributionsToDo.ipynb
     - file: 3.DiscreteModelQuize.md
 
+- file: 4.DistributionsInBayes
+  sections:
+    - file: 4.NormalData
+    - file: 4.ExponentialData
+    - file: 4.InverseGammaDistribution
+    - file: 4.NonInformativePriors
+    - file: 4.JeffreysPrior
+    - file: 4.FisherInformation
+
