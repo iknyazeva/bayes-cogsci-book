@@ -38,6 +38,7 @@ chapters:
     - file: 4.JeffreysPrior
     - file: 4.FisherInformation
     - file: 4.0.ContinuousModuleQuize.md
+    - file: ContinuousQuize.ipynb
 
 - file: 5.BayesianFramework
   sections: 
