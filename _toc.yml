@@ -45,3 +45,10 @@ chapters:
     - file: 5.LinearRegression
     - file: 5.BayesianModellingSteps
 
+- file: 6.MonteCarloEstimation
+  sections:
+    - file: 6.MarkovChains
+    - file: 6.MetropolisHastings
+    - file: 6.GibbsSamping
+    - file: 6.AssessingConvergence
+
