@@ -1,0 +1,49 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: Bayesian Analysis of Empirical Data
+author: Irina Knyazeva
+logo: logo.png
+
+# Force re-execution of notebooks on each build.
+# See https://jupyterbook.org/content/execute.html
+execute:
+  execute_notebooks: "off"
+
+sphinx:
+  extra_extensions:
+    - sphinxcontrib.mermaid
+
+# Define the name of the latex output file for PDF builds
+latex:
+  latex_documents:
+    targetname: book.tex
+
+# Add a bibtex file so that we can create citations
+bibtex_bibfiles:
+  - references.bib
+
+# Information about where the book exists on the web
+repository:
+  url: https://github.com/iknyazeva/bayes-cogsci-book
+  path_to_book: ""
+  branch: main
+
+# Launch buttons (Colab & Binder integration)
+launch_buttons:
+  colab_url: "https://colab.research.google.com"
+  binderhub_url: "https://mybinder.org"
+  notebook_interface: "jupyterlab"
+  thebe: false
+
+# HTML and theme customization
+html:
+  use_issues_button: true
+  use_repository_button: true
+  use_edit_page_button: true
+  home_page_in_navbar: true
+  extra_navbar: |
+    <div class="sidebar-footer">
+      <a href="https://github.com/iknyazeva/bayes-cogsci-book" target="_blank">GitHub Repository</a> |
+      <a href="https://streamlit.io" target="_blank">Streamlit Apps</a>
+    </div>
