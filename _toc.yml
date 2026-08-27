@@ -39,9 +39,10 @@ parts:
           - file: 4.DistributionsInBayes
           - file: 4.NormalData
           - file: 4.NonInformativePriors
-      - file: 6.MonteCarloEstimation
+      - file: 6.BayesianComputationMCMC
         title: "Session 6: Bayesian Computation (Monte Carlo, MCMC, HMC & NUTS)"
         sections:
+          - file: 6.MonteCarloEstimation
           - file: 6.MarkovChains
           - file: 6.MetropolisHastings
           - file: 6.GibbsSampling
