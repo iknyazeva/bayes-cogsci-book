@@ -8,26 +8,36 @@ import pandas as pd
 st.set_page_config(page_title="MCMC & Metropolis-Hastings", page_icon="🔄", layout="wide")
 
 st.title("🔄 Module 2: Interactive Metropolis-Hastings MCMC Sampler")
-st.markdown(r"""
-*Course: Bayesian Analysis of Empirical Data (Chapter 6 & 11)*  
-Understand the mechanics of Markov Chain Monte Carlo (MCMC) sampling, proposal tuning, and convergence diagnostics before running modern samplers in **PyMC 5**.
+st.caption("📖 **Coursebook Reference:** [Session 6: Bayesian Computation (MCMC & HMC)](https://iknyazeva.github.io/bayes-cogsci-book/) & [Session 11: Diagnostics Gate](https://iknyazeva.github.io/bayes-cogsci-book/)")
+
+st.markdown("""
+*Context: Synthetic teaching sampler for building geometric and algorithmic intuition before running PyMC 5.*  
+Explore how proposal scale tuning ($\sigma_{\text{prop}}$) controls chain exploration, acceptance rates, and autocorrelation.
 """)
 
-with st.expander("📖 Target Distributions & Algorithm Details", expanded=False):
+with st.expander("📖 Metropolis-Hastings Random Walk Algorithm", expanded=False):
     st.markdown(r"""
-    **Metropolis-Hastings Step Rule (Symmetric Proposal):**
-    1. At step $t$, current state is $\theta^{(t)}$. Propose candidate $\theta^* \sim \mathcal{N}(\theta^{(t)}, \sigma_{\text{prop}}^2)$.
-    2. Compute acceptance probability:
-       $$\alpha(\theta^{(t)}, \theta^*) = \min\left(1, \frac{p(\theta^*)}{p(\theta^{(t)})}\right)$$
-    3. Draw $u \sim \text{Uniform}(0, 1)$. If $u \le \alpha$, accept: $\theta^{(t+1)} = \theta^*$; else reject: $\theta^{(t+1)} = \theta^{(t)}$.
+    **Symmetric Random-Walk Step Rule:**
+    1. Given current state $\theta^{(t)}$, draw candidate $\theta^* \sim \mathcal{N}(\theta^{(t)}, \sigma_{\text{prop}}^2)$.
+    2. Compute acceptance ratio:
+       $$\alpha = \min\left(1, \frac{p(\theta^*)}{p(\theta^{(t)})}\right)$$
+    3. Draw $u \sim \text{Uniform}(0, 1)$. If $u \le \alpha$, accept ($\theta^{(t+1)} = \theta^*$); else reject ($\theta^{(t+1)} = \theta^{(t)}$).
     """)
 
 # Sidebar Controls
 st.sidebar.header("⚙️ Sampler Settings")
 
+if st.sidebar.button("🔄 Reset to Defaults"):
+    st.session_state.target_choice = "Standard Normal N(0, 1)"
+    st.session_state.sigma_prop = 1.5
+    st.session_state.n_samples = 1500
+    st.session_state.n_burnin = 200
+    st.session_state.n_chains = 2
+
 target_choice = st.sidebar.selectbox(
     "Target Distribution $p(\\theta)$",
-    ["Standard Normal N(0, 1)", "Bimodal Gaussian Mixture (Modes at -2 & +2)", "Skewed / Heavy-Tailed Student-t (df=3)"]
+    ["Standard Normal N(0, 1)", "Bimodal Gaussian Mixture (Modes at -2 & +2)", "Skewed / Heavy-Tailed Student-t (df=3)"],
+    index=0
 )
 
 def target_pdf(x):
@@ -40,28 +50,28 @@ def target_pdf(x):
 
 sigma_prop = st.sidebar.slider(
     r"Proposal Standard Deviation $\sigma_{\text{prop}}$",
-    min_value=0.05, max_value=8.0, value=1.5, step=0.05,
-    help="Tuning width: Very small = stuck local walk (high acceptance); Very large = frequent rejection; ~1.5-2.4 = optimal mixing."
+    min_value=0.05, max_value=8.0, value=st.session_state.get('sigma_prop', 1.5), step=0.05,
+    help="Tuning width: Very small = slow exploration; Very large = frequent rejection; ~1.5-2.4 = optimal mixing."
 )
 
 if sigma_prop < 0.2:
-    st.sidebar.warning("⚠️ **Proposal too narrow**: High acceptance rate, but very slow exploration (high autocorrelation)!")
+    st.sidebar.warning("⚠️ **Proposal too narrow**: High acceptance rate, but very slow mixing / high autocorrelation!")
 elif sigma_prop > 4.5:
-    st.sidebar.error("⚠️ **Proposal too wide**: Chain frequently proposes low-density points and gets stuck (low acceptance rate)!")
+    st.sidebar.error("⚠️ **Proposal too wide**: Chain frequently proposes low-density points and gets stuck!")
 else:
     st.sidebar.success("✅ **Proposal well-tuned**: Balances exploration and acceptance (~20–45%).")
 
-tab_sim, tab_step, tab_diag = st.tabs(["🚀 Full Simulation & Traceplots", "👣 Step-by-Step Interactive Walk", r"📊 Diagnostics ($\hat{R}$ & ESS)"])
+tab_sim, tab_step, tab_diag = st.tabs(["🚀 Full Simulation & Traceplots", "👣 Step-by-Step Interactive Walk", "📊 Diagnostics ($\hat{R}$ & ESS)"])
 
 # Simulation tab
 with tab_sim:
     col_s1, col_s2, col_s3 = st.columns(3)
     with col_s1:
-        n_samples = st.slider("Total Draws ($N$)", min_value=200, max_value=5000, value=1500, step=100)
+        n_samples = st.slider("Total Draws ($N$)", min_value=200, max_value=5000, value=st.session_state.get('n_samples', 1500), step=100)
     with col_s2:
-        n_burnin = st.slider("Warmup / Burn-in", min_value=0, max_value=1000, value=200, step=50)
+        n_burnin = st.slider("Warmup / Burn-in", min_value=0, max_value=1000, value=st.session_state.get('n_burnin', 200), step=50)
     with col_s3:
-        n_chains = st.slider("Number of Parallel Chains", min_value=1, max_value=4, value=2, step=1)
+        n_chains = st.slider("Number of Parallel Chains", min_value=1, max_value=4, value=st.session_state.get('n_chains', 2), step=1)
         
     run_seed = st.number_input("Random Seed", value=123, step=1)
     np.random.seed(run_seed)
@@ -71,7 +81,6 @@ with tab_sim:
     acceptances = []
     
     for c in range(n_chains):
-        # Stagger initial values across chains
         init_val = np.random.uniform(-4, 4) if c > 0 else 0.0
         chain = np.zeros(n_samples)
         chain[0] = init_val
@@ -101,7 +110,6 @@ with tab_sim:
     m1.metric("Average Acceptance Rate", f"{avg_acc:.1%}", delta="Optimal ~23-45%")
     m2.metric("Retained Samples / Chain", f"{n_samples - n_burnin}")
     
-    # Retained samples across all chains
     retained_chains = [c[n_burnin:] for c in chains]
     all_retained = np.concatenate(retained_chains)
     m3.metric("Posterior Mean", f"{np.mean(all_retained):.3f}")
@@ -109,7 +117,6 @@ with tab_sim:
     
     st.markdown("---")
     
-    # Plotly visualization: Trace plot & Histogram
     fig_mcmc = make_subplots(
         rows=1, cols=2,
         column_widths=[0.6, 0.4],
@@ -124,16 +131,13 @@ with tab_sim:
             row=1, col=1
         )
     
-    # Add burnin vertical line
     fig_mcmc.add_vline(x=n_burnin, line_width=1.5, line_dash="dash", line_color="black", row=1, col=1)
     
-    # Histogram of retained
     fig_mcmc.add_trace(
         go.Histogram(x=all_retained, histnorm='probability density', nbinsx=50, name='Sampled Draws', marker_color='rgba(31, 119, 180, 0.5)'),
         row=1, col=2
     )
     
-    # True target density overlay
     x_grid = np.linspace(-6, 6, 400)
     fig_mcmc.add_trace(
         go.Scatter(x=x_grid, y=target_pdf(x_grid), mode='lines', name='True Target p(θ)', line=dict(color='black', width=2.5, dash='dash')),
@@ -177,16 +181,13 @@ with tab_step:
     else:
         res_col4.error("❌ **REJECTED** ($\theta^{(t+1)} = \theta^{(t)}$)")
         
-    # Step plot
     x_plot = np.linspace(-6, 6, 400)
     fig_step = go.Figure()
     fig_step.add_trace(go.Scatter(x=x_plot, y=target_pdf(x_plot), mode='lines', name='Target p(θ)', line=dict(color='black', width=2)))
     
-    # Proposal distribution around current state
     prop_pdf = stats.norm.pdf(x_plot, curr_theta, sigma_prop)
     fig_step.add_trace(go.Scatter(x=x_plot, y=prop_pdf, mode='lines', name=f'Proposal N({curr_theta:.1f}, {sigma_prop:.2f}²)', line=dict(color='gray', dash='dot')))
     
-    # Points
     fig_step.add_trace(go.Scatter(x=[curr_theta], y=[p_c], mode='markers', marker=dict(size=14, color='blue'), name='Current State θ(t)'))
     fig_step.add_trace(go.Scatter(x=[cand_theta], y=[p_p], mode='markers', marker=dict(size=16, color='green' if accepted else 'red', symbol='star'), name='Candidate θ*'))
     
@@ -195,9 +196,9 @@ with tab_step:
 
 # Diagnostics tab
 with tab_diag:
-    st.subheader(r"📊 MCMC Diagnostics: Autocorrelation, ESS, and $\hat{R}$")
+    st.subheader(r"📊 Teaching Diagnostics: Autocorrelation, ESS, and $\hat{R}$")
+    st.info("ℹ️ **Note on Diagnostics**: The metrics below are teaching approximations computed on 1D random-walk draws. For full applied PyMC models, ArviZ computes rank-normalized split $\hat{R}$ and separate bulk/tail ESS.")
     
-    # Autocorrelation
     def autocorr(x, max_lag=40):
         n = len(x)
         x_mean = np.mean(x)
@@ -210,11 +211,9 @@ with tab_diag:
     lags = 40
     acf_chain1 = autocorr(retained_chains[0], max_lag=lags)
     
-    # Simple ESS approximation
     act = 1.0 + 2.0 * np.sum(acf_chain1[1:min(15, len(acf_chain1))])
     ess_est = len(retained_chains[0]) / max(1.0, act)
     
-    # Simple Gelman-Rubin R-hat across chains
     if len(retained_chains) > 1:
         M = len(retained_chains)
         N = len(retained_chains[0])
@@ -229,7 +228,7 @@ with tab_diag:
         
     d1, d2, d3 = st.columns(3)
     d1.metric("Effective Sample Size (ESS)", f"{int(ess_est)}", help="Number of independent draws equivalent to correlated MCMC sample.")
-    d2.metric(r"Gelman-Rubin $\hat{R}$", f"{r_hat:.3f}", delta="Target: < 1.01")
+    d2.metric(r"Gelman-Rubin $\hat{R}$ (Approx)", f"{r_hat:.3f}", delta="Target: < 1.01")
     d3.metric("Autocorrelation at Lag 1", f"{acf_chain1[1]:.3f}")
     
     fig_acf = go.Figure()
@@ -238,9 +237,9 @@ with tab_diag:
     st.plotly_chart(fig_acf, use_container_width=True)
 
 st.markdown("---")
-st.markdown(r"""
+st.markdown("""
 ### 🧠 Guided Inquiry Questions for Students
-1. **Proposal Tuning:** What happens to the acceptance rate and traceplot when you set $\\sigma_{\\text{prop}} = 0.05$? Why is a 95% acceptance rate bad in this case?
-2. **Multimodal Exploration:** For the Bimodal target, test $\\sigma_{\\text{prop}} = 0.5$ vs $\\sigma_{\\text{prop}} = 2.5$. Which one gets trapped in a single mode?
-3. **Diagnostics Rule:** When can you trust MCMC estimates? (Course gate: $\\hat{R} < 1.01$, $\\text{ESS} > 400$, 0 divergences).
+1. **The Acceptance Paradox:** Set $\\sigma_{\\text{prop}} = 0.05$. Why does a 95% acceptance rate produce an ineffective, highly autocorrelated sampler?
+2. **Mode Trapping:** Choose the Bimodal target distribution. Compare $\\sigma_{\\text{prop}} = 0.5$ with $\\sigma_{\\text{prop}} = 2.5$. Under what conditions does the chain fail to discover the second mode?
+3. **Diagnostic Gate:** Why is $\\hat{R} \\le 1.01$ and $\\text{ESS} \\ge 400$ required across multiple chains before drawing scientific conclusions?
 """)

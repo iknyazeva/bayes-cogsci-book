@@ -4,53 +4,80 @@
 format: jb-book
 root: 0.Course_overview
 parts:
-  - caption: "Part I: Foundations of Probability & Updating"
+  - caption: "Part I: Foundations & Generative Workflow (Sessions 1–4)"
     chapters:
       - file: 1.ProbabilityParadigms
+        title: "Session 1: Research Questions, Estimands & Measurement"
+        sections:
+          - file: 1.Distributions
+      - file: 1.BayesTheorem
+        title: "Session 2: Probability, Likelihood & Bayesian Updating"
         sections:
           - file: 1.ProbabilityRules
-          - file: 1.BayesTheorem
-          - file: 1.Distributions
-          - file: 1.Quiz(Probability)
-          - file: 1.Quiz(Bayes)
-      - file: 2.StatisticalInference
-        sections:
-          - file: 2.FrequentistInference
+          - file: 2.StatisticalInference
           - file: 2.BayesianInference
-          - file: 2.CDF
-          - file: 2.Quiz(General)
-          - file: 2.Quiz(BayesianInference)
       - file: 3.Conjugates
+        title: "Session 3: Generative Models, Likelihood & Prediction"
         sections:
           - file: 3.LikelihoodExmpl.ipynb
-          - file: 3.ConjugatePriors
+      - file: 3.ConjugatePriors
+        title: "Session 4: Priors, Posterior Uncertainty & Predictive Checks"
+        sections:
           - file: 3.PriorPredictiveDistribution
           - file: 3.PosteriorPredictiveDistribution
           - file: 3.ConjugatesDistributionsToDo.ipynb
-          - file: 3.DiscreteModelQuiz
 
-  - caption: "Part II: Continuous Models, Priors & MCMC Computation"
+  - caption: "Part II: Design & Computation (Sessions 5–6)"
     chapters:
       - file: 4.DistributionsInBayes
+        title: "Session 5: Simulation, Parameter Recovery & Research Design"
         sections:
           - file: 4.NormalData
-          - file: 4.ExponentialData
-          - file: 4.InverseGammaDistribution
           - file: 4.NonInformativePriors
-          - file: 4.JeffreysPrior
-          - file: 4.FisherInformation
-          - file: 4.0.ContinuousModuleQuiz
-          - file: ContinuousQuiz.ipynb
       - file: 6.MonteCarloEstimation
+        title: "Session 6: Bayesian Computation (Monte Carlo, MCMC, HMC & NUTS)"
         sections:
           - file: 6.MarkovChains
           - file: 6.MetropolisHastings
           - file: 6.GibbsSampling
-          - file: 6.AssessingConvergence
 
-  - caption: "Part III: Regression, Applied Models & Workflow"
+  - caption: "Part III: Applied Models & Hierarchies (Sessions 7–10)"
     chapters:
-      - file: 5.BayesianFramework
+      - file: 4.ExponentialData
+        title: "Session 7: Continuous Outcomes & Robust Models"
         sections:
-          - file: 5.LinearRegression
+          - file: 4.InverseGammaDistribution
+          - file: 4.JeffreysPrior
+          - file: 4.FisherInformation
+      - file: 5.LinearRegression
+        title: "Session 8: Regression, Interactions & Conditional Prediction"
+      - file: 5.BayesianFramework
+        title: "Session 9–10: GLMs, Hierarchical Models & Workflow"
+        sections:
           - file: 5.BayesianModellingSteps
+
+  - caption: "Part IV: Diagnostics & Model Checking (Session 11)"
+    chapters:
+      - file: 6.AssessingConvergence
+        title: "Session 11: Convergence Diagnostics Gate & Model Checking"
+
+  - caption: "Reference & Practice Appendices"
+    chapters:
+      - file: 2.FrequentistInference
+        title: "Appendix A: Frequentist Inference & Classical Comparisons"
+      - file: 2.CDF
+        title: "Appendix B: Cumulative Distribution Functions (CDF)"
+      - file: 1.Quiz(Probability)
+        title: "Self-Check: Probability Foundations"
+      - file: 1.Quiz(Bayes)
+        title: "Self-Check: Bayes' Theorem & Screening"
+      - file: 2.Quiz(General)
+        title: "Self-Check: Inference Concepts"
+      - file: 2.Quiz(BayesianInference)
+        title: "Self-Check: Bayesian Updating"
+      - file: 3.DiscreteModelQuiz
+        title: "Self-Check: Discrete & Conjugate Models"
+      - file: 4.0.ContinuousModuleQuiz
+        title: "Self-Check: Continuous Distributions"
+      - file: ContinuousQuiz.ipynb
+        title: "Laboratory Quiz: Continuous Simulation"
