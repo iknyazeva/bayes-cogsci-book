@@ -12,9 +12,6 @@ parts:
         title: "Session 2: Probability, Likelihood & Bayesian Updating"
       - file: 3.GenerativeModelsLikelihoodPrediction
         title: "Session 3: Generative Models, Likelihood & Prediction"
-        sections:
-          - file: 3.Conjugates
-          - file: 3.LikelihoodExmpl.ipynb
       - file: 4.PriorsPosteriorPredictiveChecks
         title: "Session 4: Priors, Posterior Uncertainty & Predictive Checks"
         sections:
