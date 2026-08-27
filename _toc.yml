@@ -33,9 +33,10 @@ parts:
 
   - caption: "Part II: Design & Computation (Sessions 5–6)"
     chapters:
-      - file: 4.DistributionsInBayes
+      - file: 5.SimulationParameterRecoveryDesign
         title: "Session 5: Simulation, Parameter Recovery & Research Design"
         sections:
+          - file: 4.DistributionsInBayes
           - file: 4.NormalData
           - file: 4.NonInformativePriors
       - file: 6.MonteCarloEstimation
