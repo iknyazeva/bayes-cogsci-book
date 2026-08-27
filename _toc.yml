@@ -18,9 +18,10 @@ parts:
           - file: 1.ProbabilityRules
           - file: 2.StatisticalInference
           - file: 2.BayesianInference
-      - file: 3.Conjugates
+      - file: 3.GenerativeModelsLikelihoodPrediction
         title: "Session 3: Generative Models, Likelihood & Prediction"
         sections:
+          - file: 3.Conjugates
           - file: 3.LikelihoodExmpl.ipynb
       - file: 3.ConjugatePriors
         title: "Session 4: Priors, Posterior Uncertainty & Predictive Checks"
