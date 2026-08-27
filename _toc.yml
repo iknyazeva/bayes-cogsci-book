@@ -6,9 +6,10 @@ root: 0.Course_overview
 parts:
   - caption: "Part I: Foundations & Generative Workflow (Sessions 1–4)"
     chapters:
-      - file: 1.ProbabilityParadigms
+      - file: 1.ResearchQuestionsDataMeasurement
         title: "Session 1: Research Questions, Estimands & Measurement"
         sections:
+          - file: 1.ProbabilityParadigms
           - file: 1.Distributions
       - file: 1.BayesTheorem
         title: "Session 2: Probability, Likelihood & Bayesian Updating"
