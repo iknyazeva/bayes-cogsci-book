@@ -8,9 +8,6 @@ parts:
     chapters:
       - file: 1.ResearchQuestionsDataMeasurement
         title: "Session 1: Research Questions, Estimands & Measurement"
-        sections:
-          - file: 1.ProbabilityParadigms
-          - file: 1.Distributions
       - file: 2.ProbabilityBayesianUpdating
         title: "Session 2: Probability, Likelihood & Bayesian Updating"
         sections:
