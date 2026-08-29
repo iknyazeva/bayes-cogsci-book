@@ -18,6 +18,7 @@ parts:
           - file: 3.ConjugatePriors
           - file: 3.PriorPredictiveDistribution
           - file: 3.PosteriorPredictiveDistribution
+          - file: 4.BayesianFrequentistConnections
           - file: 3.ConjugatesDistributionsToDo.ipynb
 
   - caption: "Part II: Design & Computation (Sessions 5–6)"
