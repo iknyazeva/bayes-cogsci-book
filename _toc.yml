@@ -15,11 +15,14 @@ parts:
       - file: 4.PriorsPosteriorPredictiveChecks
         title: "Session 4: Priors, Posterior Uncertainty & Predictive Checks"
         sections:
-          - file: 3.ConjugatePriors
-          - file: 3.PriorPredictiveDistribution
-          - file: 3.PosteriorPredictiveDistribution
+          - file: 4.ConjugatePriors
+          - file: 4.PriorPredictiveDistribution
+          - file: 4.PosteriorPredictiveDistribution
+          - file: 4.NonInformativePriors
+          - file: 4.JeffreysPrior
+          - file: 4.FisherInformation
           - file: 4.BayesianFrequentistConnections
-          - file: 3.ConjugatesDistributionsToDo.ipynb
+          - file: 4.ConjugatesDistributionsToDo.ipynb
 
   - caption: "Part II: Design & Computation (Sessions 5–6)"
     chapters:
@@ -28,7 +31,6 @@ parts:
         sections:
           - file: 4.DistributionsInBayes
           - file: 4.NormalData
-          - file: 4.NonInformativePriors
       - file: 6.BayesianComputationMCMC
         title: "Session 6: Bayesian Computation (Monte Carlo, MCMC, HMC & NUTS)"
         sections:
@@ -43,8 +45,6 @@ parts:
         title: "Session 7: Continuous Outcomes & Robust Models"
         sections:
           - file: 4.InverseGammaDistribution
-          - file: 4.JeffreysPrior
-          - file: 4.FisherInformation
       - file: 5.LinearRegression
         title: "Session 8: Regression, Interactions & Conditional Prediction"
       - file: 5.BayesianFramework
