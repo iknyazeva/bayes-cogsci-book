@@ -19,6 +19,7 @@ parts:
           - file: 4.PriorPredictiveDistribution
           - file: 4.PosteriorPredictiveDistribution
           - file: 4.NonInformativePriors
+          - file: 4.InverseGammaDistribution
           - file: 4.JeffreysPrior
           - file: 4.FisherInformation
           - file: 4.BayesianFrequentistConnections
@@ -46,8 +47,6 @@ parts:
         sections:
           - file: 7.ComparingMeansBEST
           - file: 7.BayesianTtestBayesFactor
-          - file: 7.ExponentialData
-          - file: 7.InverseGammaDistribution
       - file: 8.RegressionInteractionsPrediction
         title: "Session 8: Regression, Interactions & Conditional Prediction"
         sections:
@@ -55,6 +54,8 @@ parts:
           - file: 8.LinearRegression
       - file: 9.GeneralizedLinearModels
         title: "Session 9: Generalized Linear Models (GLMs)"
+        sections:
+          - file: 9.ExponentialData
       - file: 10.HierarchicalModelsPartialPooling
         title: "Session 10: Hierarchical Models & Partial Pooling"
 
