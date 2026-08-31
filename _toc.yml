@@ -41,16 +41,19 @@ parts:
 
   - caption: "Part III: Applied Models & Hierarchies (Sessions 7–10)"
     chapters:
-      - file: 4.ExponentialData
+      - file: 7.ContinuousOutcomesRobustModels
         title: "Session 7: Continuous Outcomes & Robust Models"
         sections:
-          - file: 4.InverseGammaDistribution
-      - file: 5.LinearRegression
+          - file: 7.ExponentialData
+          - file: 7.InverseGammaDistribution
+      - file: 8.RegressionInteractionsPrediction
         title: "Session 8: Regression, Interactions & Conditional Prediction"
-      - file: 5.BayesianFramework
-        title: "Session 9–10: GLMs, Hierarchical Models & Workflow"
         sections:
-          - file: 5.BayesianModellingSteps
+          - file: 8.LinearRegression
+      - file: 9.GeneralizedLinearModels
+        title: "Session 9: Generalized Linear Models (GLMs)"
+      - file: 10.HierarchicalModelsPartialPooling
+        title: "Session 10: Hierarchical Models & Partial Pooling"
 
   - caption: "Part IV: Diagnostics & Model Checking (Session 11)"
     chapters:
