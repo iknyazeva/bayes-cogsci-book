@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Bayesian updating curves logo concept</title>
+  <desc id="desc">A blue prior and green likelihood converge into a dark teal posterior.</desc>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 181 C51 181 53 91 87 91 C113 91 119 150 136 168"
+          stroke="#2367A6" stroke-width="12"/>
+    <path d="M28 181 C48 181 60 151 83 143 C108 134 126 151 138 169"
+          stroke="#65B84C" stroke-width="12"/>
+    <path d="M128 181 C145 181 151 156 158 125 C166 88 176 55 195 55 C220 55 225 135 232 181"
+          stroke="#155F66" stroke-width="18"/>
+    <path d="M128 181 C145 181 151 156 158 125 C166 88 176 55 195 55 C220 55 225 135 232 181"
+          stroke="#78C85C" stroke-width="7"/>
+    <path d="M28 207 H232" stroke="#164F86" stroke-width="10"/>
+  </g>
+</svg>

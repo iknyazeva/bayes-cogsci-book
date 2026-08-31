@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Data to posterior logo concept</title>
+  <desc id="desc">Blue observations flow into a green posterior density curve.</desc>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M116 190 C138 190 145 179 154 154 C164 125 174 70 197 70 C222 70 227 139 234 190"
+          stroke="#164F86" stroke-width="16"/>
+    <path d="M116 190 C138 190 145 179 154 154 C164 125 174 70 197 70 C222 70 227 139 234 190"
+          stroke="#65B84C" stroke-width="8"/>
+  </g>
+  <g fill="#2367A6">
+    <circle cx="33" cy="174" r="7"/>
+    <circle cx="53" cy="151" r="8"/>
+    <circle cx="75" cy="179" r="9"/>
+    <circle cx="94" cy="139" r="10"/>
+    <circle cx="115" cy="168" r="11"/>
+  </g>
+  <path d="M31 207 H234" fill="none" stroke="#164F86" stroke-width="10" stroke-linecap="round"/>
+</svg>

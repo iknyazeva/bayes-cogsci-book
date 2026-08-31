@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Bayesian lens logo concept</title>
+  <desc id="desc">A magnifying lens encloses observations and a posterior curve.</desc>
+  <circle cx="108" cy="105" r="70" fill="none" stroke="#164F86" stroke-width="18"/>
+  <path d="M158 155 L221 218" fill="none" stroke="#164F86" stroke-width="24" stroke-linecap="round"/>
+  <g fill="#2367A6">
+    <circle cx="65" cy="114" r="7"/>
+    <circle cx="88" cy="91" r="8"/>
+    <circle cx="111" cy="119" r="9"/>
+  </g>
+  <path d="M56 142 C77 142 81 134 88 119 C99 94 108 65 124 65 C145 65 150 110 157 142"
+        fill="none" stroke="#65B84C" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M55 143 H158" fill="none" stroke="#155F66" stroke-width="8" stroke-linecap="round"/>
+</svg>
