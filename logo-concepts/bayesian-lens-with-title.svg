@@ -15,8 +15,8 @@
     <path d="M55 143 H158" fill="none" stroke="#155F66" stroke-width="8" stroke-linecap="round"/>
   </g>
 
-  <g text-anchor="middle" font-family="Inter, Avenir Next, Helvetica Neue, Arial, sans-serif">
-    <text x="512" y="745" fill="#164F86" font-size="75" font-weight="750" letter-spacing="3">BAYESIAN ANALYSIS</text>
-    <text x="512" y="832" fill="#65B84C" font-size="61" font-weight="700" letter-spacing="5">OF EMPIRICAL DATA</text>
+  <g text-anchor="middle" font-family="Arial Rounded MT Bold, Arial Rounded, Helvetica, Arial, sans-serif">
+    <text x="512" y="745" fill="#164F86" font-size="75" font-weight="400" letter-spacing="1.5">BAYESIAN ANALYSIS</text>
+    <text x="512" y="832" fill="#65B84C" font-size="61" font-weight="400" letter-spacing="2">OF EMPIRICAL DATA</text>
   </g>
 </svg>
