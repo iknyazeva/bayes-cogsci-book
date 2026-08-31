@@ -46,11 +46,11 @@ parts:
         title: "Session 7: Continuous Outcomes & Robust Models"
         sections:
           - file: 7.ComparingMeansBEST
+          - file: 7.BayesianANOVA
           - file: 7.BayesianTtestBayesFactor
       - file: 8.RegressionInteractionsPrediction
         title: "Session 8: Regression, Interactions & Conditional Prediction"
         sections:
-          - file: 8.BayesianANOVA
           - file: 8.LinearRegression
       - file: 9.GeneralizedLinearModels
         title: "Session 9: Generalized Linear Models (GLMs)"
