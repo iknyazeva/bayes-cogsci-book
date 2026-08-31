@@ -55,6 +55,9 @@ parts:
       - file: 9.GeneralizedLinearModels
         title: "Session 9: Generalized Linear Models (GLMs)"
         sections:
+          - file: 9.LogisticRegression
+          - file: 9.OrderedLogisticRegression
+          - file: 9.PoissonRegression
           - file: 9.ExponentialData
       - file: 10.HierarchicalModelsPartialPooling
         title: "Session 10: Hierarchical Models & Partial Pooling"
