@@ -76,8 +76,20 @@ parts:
 
   - caption: "Part IV: Diagnostics & Model Checking (Session 11)"
     chapters:
-      - file: 6.AssessingConvergence
-        title: "Session 11: Convergence Diagnostics Gate & Model Checking"
+      - file: 11.DiagnosticsPPCModelComparison
+        title: "Session 11: Diagnostics, PPC & Predictive Model Comparison"
+        sections:
+          - file: 6.AssessingConvergence
+            title: "MCMC Convergence Diagnostics & Sampler Checks (Reference)"
+
+  - caption: "Part V: Causality, Generalization & Synthesis (Sessions 12–14)"
+    chapters:
+      - file: 12.CausalInference
+        title: "Session 12: Causal Inference & Directed Acyclic Graphs"
+      - file: 13.MissingDataPoststratificationGeneralization
+        title: "Session 13: Missing Data, Poststratification & Generalization"
+      - file: 14.CompleteEmpiricalAnalysisProtocol
+        title: "Session 14: Complete Empirical Analysis & Research Protocol"
 
   - caption: "Reference & Practice Appendices"
     chapters:
