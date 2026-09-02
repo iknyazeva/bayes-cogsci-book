@@ -33,6 +33,7 @@ parts:
       - file: 5.SimulationParameterRecoveryDesign
         title: "Session 5: Simulation, Parameter Recovery & Research Design"
         sections:
+          - file: 5.ParameterRecoveryCalibration
           - file: 5.PowerAnalysisBayesianDesignSimulation
           - file: 5.SampleAllocationDesigns
       - file: 6.BayesianComputationMCMC
