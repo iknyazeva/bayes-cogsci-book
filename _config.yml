@@ -13,6 +13,11 @@ execute:
 sphinx:
   extra_extensions:
     - sphinxcontrib.mermaid
+  config:
+    exclude_patterns:
+      - "_archive/*"
+      - "AGENTS.md"
+      - "logo-concepts/*"
 
 # Define the name of the latex output file for PDF builds
 latex:
@@ -44,6 +49,5 @@ html:
   home_page_in_navbar: true
   extra_navbar: |
     <div class="sidebar-footer">
-      <a href="https://github.com/iknyazeva/bayes-cogsci-book" target="_blank">GitHub Repository</a> |
-      <a href="https://streamlit.io" target="_blank">Streamlit Apps</a>
+      <a href="https://github.com/iknyazeva/bayes-cogsci-book" target="_blank">GitHub Repository</a>
     </div>
