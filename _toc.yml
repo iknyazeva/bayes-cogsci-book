@@ -50,24 +50,29 @@ parts:
         title: "Session 7: Continuous Outcomes & Robust Models"
         sections:
           - file: 7.ComparingMeansBEST
-          - file: 7.BayesianANOVA
+          - file: 9.ExponentialData
+            title: "Positive Outcomes & Duration Models"
           - file: 7.BayesianTtestBayesFactor
+            title: "Bayes Factors & Two-Sample Testing (Optional)"
       - file: 8.RegressionInteractionsPrediction
         title: "Session 8: Regression, Interactions & Conditional Prediction"
         sections:
+          - file: 7.BayesianANOVA
+            title: "Categorical Predictors & Factorial Contrasts"
           - file: 8.LinearRegression
+            title: "Matrix Regression & Analytic Foundations (Reference)"
       - file: 9.GeneralizedLinearModels
         title: "Session 9: Generalized Linear Models (GLMs)"
         sections:
           - file: 9.LogisticRegression
-          - file: 9.OrderedLogisticRegression
           - file: 9.PoissonRegression
-          - file: 9.ExponentialData
+          - file: 9.OrderedLogisticRegression
       - file: 10.HierarchicalModelsPartialPooling
         title: "Session 10: Hierarchical Models & Partial Pooling"
         sections:
           - file: 10.PartialPoolingChimpanzees
           - file: 10.MixedModelsVsHierarchicalBayes
+            title: "Frequentist Mixed Models vs. Hierarchical Bayes (Reference)"
 
   - caption: "Part IV: Diagnostics & Model Checking (Session 11)"
     chapters:
