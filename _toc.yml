@@ -12,10 +12,13 @@ parts:
         title: "Session 2: Probability, Likelihood & Bayesian Updating"
       - file: 3.GenerativeModelsLikelihoodPrediction
         title: "Session 3: Generative Models, Likelihood & Prediction"
+        sections:
+          - file: 3.DistributionsInBayes
       - file: 4.PriorsPosteriorPredictiveChecks
         title: "Session 4: Priors, Posterior Uncertainty & Predictive Checks"
         sections:
           - file: 4.ConjugatePriors
+          - file: 4.NormalModels
           - file: 4.PriorPredictiveDistribution
           - file: 4.PosteriorPredictiveDistribution
           - file: 4.NonInformativePriors
@@ -23,15 +26,12 @@ parts:
           - file: 4.JeffreysPrior
           - file: 4.FisherInformation
           - file: 4.BayesianFrequentistConnections
-          - file: 4.ConjugatesDistributionsToDo.ipynb
+          - file: 4.ConjugatesDistributionsToDo
 
   - caption: "Part II: Design & Computation (Sessions 5–6)"
     chapters:
       - file: 5.SimulationParameterRecoveryDesign
         title: "Session 5: Simulation, Parameter Recovery & Research Design"
-        sections:
-          - file: 5.DistributionsInBayes
-          - file: 5.NormalData
       - file: 6.BayesianComputationMCMC
         title: "Session 6: Bayesian Computation (Monte Carlo, MCMC, HMC & NUTS)"
         sections:
