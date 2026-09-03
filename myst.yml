@@ -100,6 +100,17 @@ project:
       title: 'Session 13: Missing Data, Poststratification & Generalization'
     - file: 14.CompleteEmpiricalAnalysisProtocol.md
       title: 'Session 14: Complete Empirical Analysis & Research Protocol'
+  - title: 'Optional Advanced Block: Inference, Decisions & Workflow'
+    children:
+    - file: Advanced.BayesianInference.md
+      title: Advanced Bayesian Inference & Decision-Making
+      children:
+      - file: Advanced.VariationalInference.md
+        title: Variational Inference
+      - file: Advanced.DecisionTheoryPrediction.md
+        title: Bayesian Decision Theory & Prediction
+      - file: Advanced.ProbabilisticProgrammingWorkflow.md
+        title: Probabilistic Programming & Bayesian Workflow
   - title: Reference & Practice Appendices
     children:
     - file: 2.FrequentistInference.md
@@ -116,11 +127,13 @@ project:
       title: 'Self-Check: Continuous Distributions'
     - file: ContinuousQuiz.ipynb
       title: 'Laboratory Quiz: Continuous Simulation'
+  static_files:
+  - _static
 site:
   template: book-theme
   options:
     logo: logo.png
-    logo_text: "Bayesian Analysis of Empirical Data"
+    logo_text: Bayesian Analysis of Empirical Data
     style: custom.css
     nav:
     - title: GitHub

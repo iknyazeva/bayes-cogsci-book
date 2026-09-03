@@ -96,6 +96,18 @@ parts:
       - file: 14.CompleteEmpiricalAnalysisProtocol
         title: "Session 14: Complete Empirical Analysis & Research Protocol"
 
+  - caption: "Optional Advanced Block: Inference, Decisions & Workflow"
+    chapters:
+      - file: Advanced.BayesianInference
+        title: "Advanced Bayesian Inference & Decision-Making"
+        sections:
+          - file: Advanced.VariationalInference
+            title: "Variational Inference"
+          - file: Advanced.DecisionTheoryPrediction
+            title: "Bayesian Decision Theory & Prediction"
+          - file: Advanced.ProbabilisticProgrammingWorkflow
+            title: "Probabilistic Programming & Bayesian Workflow"
+
   - caption: "Reference & Practice Appendices"
     chapters:
       - file: 2.FrequentistInference

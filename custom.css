@@ -30,3 +30,18 @@
 .dark .myst-home-link span:not(.sr-only) {
   color: #f1f5f9;
 }
+
+/* Interactive Plotly iframe styling */
+iframe {
+  width: 100% !important;
+  min-height: 480px;
+  border: none !important;
+  border-radius: 8px;
+  background: #ffffff;
+  margin: 1.25rem 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dark iframe {
+  background: #1e293b;
+}
