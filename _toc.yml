@@ -8,6 +8,11 @@ parts:
     chapters:
       - file: 1.ResearchQuestionsDataMeasurement
         title: "Session 1: Research Questions, Estimands & Measurement"
+        sections:
+          - file: 1.RandomVariablesRecap
+            title: "Random Variables & the Central Limit Theorem (Optional Recap)"
+          - file: 1.ProbabilityBayesQuiz
+            title: "Probability & Bayes Self-Check (Optional)"
       - file: 2.ProbabilityBayesianUpdating
         title: "Session 2: Probability, Likelihood & Bayesian Updating"
       - file: 3.GenerativeModelsLikelihoodPrediction
@@ -97,10 +102,6 @@ parts:
         title: "Appendix A: Frequentist Inference & Classical Comparisons"
       - file: 2.CDF
         title: "Appendix B: Cumulative Distribution Functions (CDF)"
-      - file: 1.Quiz(Probability)
-        title: "Self-Check: Probability Foundations"
-      - file: 1.Quiz(Bayes)
-        title: "Self-Check: Bayes' Theorem & Screening"
       - file: 2.Quiz(General)
         title: "Self-Check: Inference Concepts"
       - file: 2.Quiz(BayesianInference)

@@ -1,0 +1,125 @@
+version: 1
+project:
+  title: Bayesian Analysis of Empirical Data
+  authors:
+  - name: Irina Knyazeva
+  github: https://github.com/iknyazeva/bayes-cogsci-book
+  bibliography:
+  - references.bib
+  exclude:
+  - _archive/*
+  - notebooks/*
+  - AGENTS.md
+  - logo-concepts/*
+  toc:
+  - file: 0.Course_overview.md
+  - title: 'Part I: Foundations & Generative Workflow (Sessions 1–4)'
+    children:
+    - file: 1.ResearchQuestionsDataMeasurement.md
+      title: 'Session 1: Research Questions, Estimands & Measurement'
+      children:
+      - file: 1.RandomVariablesRecap.md
+        title: Random Variables & the Central Limit Theorem (Optional Recap)
+      - file: 1.ProbabilityBayesQuiz.md
+        title: Probability & Bayes Self-Check (Optional)
+    - file: 2.ProbabilityBayesianUpdating.md
+      title: 'Session 2: Probability, Likelihood & Bayesian Updating'
+    - file: 3.GenerativeModelsLikelihoodPrediction.md
+      title: 'Session 3: Generative Models, Likelihood & Prediction'
+      children:
+      - file: 3.DistributionsInBayes.md
+    - file: 4.PriorsPosteriorPredictiveChecks.md
+      title: 'Session 4: Priors, Posterior Uncertainty & Predictive Checks'
+      children:
+      - file: 4.ConjugatePriors.md
+      - file: 4.NormalModels.md
+      - file: 4.PriorPredictiveDistribution.md
+      - file: 4.PosteriorPredictiveDistribution.md
+      - file: 4.NonInformativePriors.md
+      - file: 4.InverseGammaDistribution.md
+      - file: 4.JeffreysPrior.md
+      - file: 4.FisherInformation.md
+      - file: 4.BayesianFrequentistConnections.md
+      - file: 4.ConjugatesDistributionsToDo.md
+  - title: 'Part II: Design & Computation (Sessions 5–6)'
+    children:
+    - file: 5.SimulationParameterRecoveryDesign.md
+      title: 'Session 5: Simulation, Parameter Recovery & Research Design'
+      children:
+      - file: 5.ParameterRecoveryCalibration.md
+      - file: 5.PowerAnalysisBayesianDesignSimulation.md
+      - file: 5.SampleAllocationDesigns.md
+    - file: 6.BayesianComputationMCMC.md
+      title: 'Session 6: Bayesian Computation (Monte Carlo, MCMC, HMC & NUTS)'
+      children:
+      - file: 6.MonteCarloEstimation.md
+      - file: 6.MarkovChains.md
+      - file: 6.MetropolisHastings.md
+      - file: 6.GibbsSampling.md
+  - title: 'Part III: Applied Models & Hierarchies (Sessions 7–10)'
+    children:
+    - file: 7.ContinuousOutcomesRobustModels.md
+      title: 'Session 7: Continuous Outcomes & Robust Models'
+      children:
+      - file: 7.ComparingMeansBEST.md
+      - file: 9.ExponentialData.md
+        title: Positive Outcomes & Duration Models
+      - file: 7.BayesianTtestBayesFactor.md
+        title: Bayes Factors & Two-Sample Testing (Optional)
+    - file: 8.RegressionInteractionsPrediction.md
+      title: 'Session 8: Regression, Interactions & Conditional Prediction'
+      children:
+      - file: 7.BayesianANOVA.md
+        title: Categorical Predictors & Factorial Contrasts
+      - file: 8.LinearRegression.md
+        title: Matrix Regression & Analytic Foundations (Reference)
+    - file: 9.GeneralizedLinearModels.md
+      title: 'Session 9: Generalized Linear Models (GLMs)'
+      children:
+      - file: 9.LogisticRegression.md
+      - file: 9.PoissonRegression.md
+      - file: 9.OrderedLogisticRegression.md
+    - file: 10.HierarchicalModelsPartialPooling.md
+      title: 'Session 10: Hierarchical Models & Partial Pooling'
+      children:
+      - file: 10.PartialPoolingChimpanzees.md
+      - file: 10.MixedModelsVsHierarchicalBayes.md
+        title: Frequentist Mixed Models vs. Hierarchical Bayes (Reference)
+  - title: 'Part IV: Diagnostics & Model Checking (Session 11)'
+    children:
+    - file: 11.DiagnosticsPPCModelComparison.md
+      title: 'Session 11: Diagnostics, PPC & Predictive Model Comparison'
+      children:
+      - file: 6.AssessingConvergence.md
+        title: MCMC Convergence Diagnostics & Sampler Checks (Reference)
+  - title: 'Part V: Causality, Generalization & Synthesis (Sessions 12–14)'
+    children:
+    - file: 12.CausalInference.md
+      title: 'Session 12: Causal Inference & Directed Acyclic Graphs'
+    - file: 13.MissingDataPoststratificationGeneralization.md
+      title: 'Session 13: Missing Data, Poststratification & Generalization'
+    - file: 14.CompleteEmpiricalAnalysisProtocol.md
+      title: 'Session 14: Complete Empirical Analysis & Research Protocol'
+  - title: Reference & Practice Appendices
+    children:
+    - file: 2.FrequentistInference.md
+      title: 'Appendix A: Frequentist Inference & Classical Comparisons'
+    - file: 2.CDF.md
+      title: 'Appendix B: Cumulative Distribution Functions (CDF)'
+    - file: 2.Quiz(General).md
+      title: 'Self-Check: Inference Concepts'
+    - file: 2.Quiz(BayesianInference).md
+      title: 'Self-Check: Bayesian Updating'
+    - file: 3.DiscreteModelQuiz.md
+      title: 'Self-Check: Discrete & Conjugate Models'
+    - file: 4.0.ContinuousModuleQuiz.md
+      title: 'Self-Check: Continuous Distributions'
+    - file: ContinuousQuiz.ipynb
+      title: 'Laboratory Quiz: Continuous Simulation'
+site:
+  template: book-theme
+  options:
+    logo: logo.png
+    nav:
+    - title: GitHub
+      url: https://github.com/iknyazeva/bayes-cogsci-book
