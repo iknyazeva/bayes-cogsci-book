@@ -1,0 +1,32 @@
+/* Custom CSS for MyST Book Theme */
+
+/* Enlarge and style the header logo */
+.myst-home-link-logo {
+  padding: 0.15rem;
+}
+
+.myst-home-link-logo img {
+  height: 3.25rem !important; /* 52px instead of 36px */
+  max-height: 52px !important;
+  width: auto !important;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease-in-out;
+}
+
+.myst-home-link:hover .myst-home-link-logo img {
+  transform: scale(1.06);
+}
+
+/* Style the site title text next to the logo */
+.myst-home-link span:not(.sr-only) {
+  font-weight: 600;
+  font-size: 1.15rem;
+  letter-spacing: -0.015em;
+  color: #1e293b;
+}
+
+.dark .myst-home-link span:not(.sr-only) {
+  color: #f1f5f9;
+}

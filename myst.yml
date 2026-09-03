@@ -120,6 +120,8 @@ site:
   template: book-theme
   options:
     logo: logo.png
+    logo_text: "Bayesian Analysis of Empirical Data"
+    style: custom.css
     nav:
     - title: GitHub
       url: https://github.com/iknyazeva/bayes-cogsci-book
