@@ -139,3 +139,27 @@ iframe[src*="interactive_prevalence_curve"] {
   min-height: 400px !important;
   height: 400px !important;
 }
+
+/* Distribution Zoo Table Sparkline Icons */
+td img[src*="bernoulli"],
+td img[src*="binomial"],
+td img[src*="poisson"],
+td img[src*="negative_binomial"],
+td img[src*="zero_inflated"],
+td img[src*="ordered_categorical"],
+td img[src*="categorical"],
+td img[src*="normal"],
+td img[src*="student_t"],
+td img[src*="lognormal"],
+td img[src*="gamma"],
+td img[src*="exponential"],
+td img[src*="ex_gaussian"],
+td img[data-canonical-url*="dist_icons"] {
+  width: 90px !important;
+  height: 44px !important;
+  max-width: 90px !important;
+  min-width: 90px !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
