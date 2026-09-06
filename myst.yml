@@ -18,6 +18,10 @@ project:
       children:
       - file: 1.RandomVariablesRecap.md
         title: Random Variables & the Central Limit Theorem (Optional Recap)
+      - file: 2.FrequentistInference.md
+        title: 'Appendix A: Frequentist Inference & Classical Comparisons'
+      - file: 2.CDF.md
+        title: 'Appendix B: Cumulative Distribution Functions (CDF)'
       - file: 1.ProbabilityBayesQuiz.md
         title: Probability & Bayes Self-Check (Optional)
     - file: 2.ProbabilityBayesianUpdating.md
@@ -111,10 +115,6 @@ project:
         title: Probabilistic Programming & Bayesian Workflow
   - title: Reference & Practice Appendices
     children:
-    - file: 2.FrequentistInference.md
-      title: 'Appendix A: Frequentist Inference & Classical Comparisons'
-    - file: 2.CDF.md
-      title: 'Appendix B: Cumulative Distribution Functions (CDF)'
     - file: 2.Quiz(General).md
       title: 'Self-Check: Inference Concepts'
     - file: 2.Quiz(BayesianInference).md

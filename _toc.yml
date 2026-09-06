@@ -11,6 +11,10 @@ parts:
         sections:
           - file: 1.RandomVariablesRecap
             title: "Random Variables & the Central Limit Theorem (Optional Recap)"
+          - file: 2.FrequentistInference
+            title: "Appendix A: Frequentist Inference & Classical Comparisons"
+          - file: 2.CDF
+            title: "Appendix B: Cumulative Distribution Functions (CDF)"
           - file: 1.ProbabilityBayesQuiz
             title: "Probability & Bayes Self-Check (Optional)"
       - file: 2.ProbabilityBayesianUpdating
@@ -110,10 +114,6 @@ parts:
 
   - caption: "Reference & Practice Appendices"
     chapters:
-      - file: 2.FrequentistInference
-        title: "Appendix A: Frequentist Inference & Classical Comparisons"
-      - file: 2.CDF
-        title: "Appendix B: Cumulative Distribution Functions (CDF)"
       - file: 2.Quiz(General)
         title: "Self-Check: Inference Concepts"
       - file: 2.Quiz(BayesianInference)
