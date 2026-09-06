@@ -1,34 +1,42 @@
 /* Custom CSS for MyST Book Theme */
 
-/* Enlarge and style the header logo */
-.myst-home-link-logo {
-  padding: 0.15rem;
+/* Header navbar height */
+.myst-top-nav {
+  min-height: 76px !important;
 }
 
-.myst-home-link-logo img {
-  height: 3.25rem !important; /* 52px instead of 36px */
-  max-height: 52px !important;
+/* Enlarge and style the header logo */
+.myst-home-link-logo {
+  padding: 0.2rem !important;
+}
+
+.myst-home-link-logo img,
+.myst-home-link img,
+a.myst-home-link img {
+  height: 4.5rem !important; /* 72px */
+  max-height: 72px !important;
+  min-height: 64px !important;
   width: auto !important;
-  object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease-in-out;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  transition: transform 0.2s ease-in-out !important;
 }
 
 .myst-home-link:hover .myst-home-link-logo img {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
 /* Style the site title text next to the logo */
 .myst-home-link span:not(.sr-only) {
-  font-weight: 600;
-  font-size: 1.15rem;
-  letter-spacing: -0.015em;
-  color: #1e293b;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  letter-spacing: -0.015em !important;
+  color: #1e293b !important;
 }
 
 .dark .myst-home-link span:not(.sr-only) {
-  color: #f1f5f9;
+  color: #f1f5f9 !important;
 }
 
 /* Interactive Plotly iframe styling */
