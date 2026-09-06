@@ -5,6 +5,18 @@
   min-height: 76px !important;
 }
 
+/* Left Table of Contents sidebar offset below top navbar */
+@media (min-width: 1280px) {
+  .myst-primary-sidebar {
+    top: 84px !important;
+    height: calc(100vh - 84px) !important;
+  }
+
+  .myst-primary-sidebar-nav {
+    padding-top: 0.75rem !important;
+  }
+}
+
 /* Style the header logo */
 .myst-home-link-logo {
   padding: 0.15rem !important;
