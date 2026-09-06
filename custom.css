@@ -5,26 +5,37 @@
   min-height: 76px !important;
 }
 
-/* Enlarge and style the header logo */
+/* Style the header logo */
 .myst-home-link-logo {
-  padding: 0.2rem !important;
+  padding: 0.15rem !important;
 }
 
 .myst-home-link-logo img,
 .myst-home-link img,
 a.myst-home-link img {
-  height: 4.5rem !important; /* 72px */
-  max-height: 72px !important;
-  min-height: 64px !important;
+  height: 3.25rem !important; /* 52px */
+  max-height: 54px !important;
+  min-height: 44px !important;
+  max-width: min(540px, 50vw) !important;
   width: auto !important;
   object-fit: contain !important;
   border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 2px 6px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
   transition: transform 0.2s ease-in-out !important;
 }
 
+.dark .myst-home-link-logo img,
+.dark .myst-home-link img,
+.dark a.myst-home-link img {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
 .myst-home-link:hover .myst-home-link-logo img {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 /* Style the site title text next to the logo */

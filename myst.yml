@@ -2,7 +2,11 @@ version: 1
 project:
   title: Bayesian Analysis of Empirical Data
   authors:
-  - name: Irina Knyazeva
+  - name: Irina Knyazeva, PhD
+    affiliations:
+    - Head of the Laboratory of Mathematical Methods for Neurodata Processing, Research Department of Interdisciplinary Brain Research, Institute of the Human Brain, Russian Academy of Sciences (IHB RAS)
+    - Saint Petersburg State University (Institute of Cognitive Studies)
+    - European University at Saint Petersburg (School of Computational Social Sciences)
   github: https://github.com/iknyazeva/bayes-cogsci-book
   bibliography:
   - references.bib
