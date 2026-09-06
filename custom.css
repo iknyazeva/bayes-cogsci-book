@@ -39,8 +39,22 @@ a.myst-home-link img {
   color: #f1f5f9 !important;
 }
 
-/* Interactive Plotly iframe styling */
+/* Interactive Plotly iframe styling and container overflow prevention */
+div:has(> iframe),
+.relative.inline-block:has(> iframe),
+div[style*="padding-bottom"] {
+  padding-bottom: 0 !important;
+  width: 100% !important;
+  min-height: 480px;
+  position: relative !important;
+  display: block !important;
+  margin-bottom: 1.5rem !important;
+}
+
 iframe {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
   width: 100% !important;
   min-height: 480px;
   border: none !important;
@@ -53,3 +67,54 @@ iframe {
 .dark iframe {
   background: #1e293b;
 }
+
+/* Specific heights for taller figures to guarantee no content overlap */
+div:has(> iframe[src*="fig2_4"]),
+.relative.inline-block:has(> iframe[src*="fig2_4"]),
+iframe[src*="fig2_4"] {
+  min-height: 600px !important;
+  height: 600px !important;
+}
+
+div:has(> iframe[src*="fig5_type_s_m_curves"]),
+.relative.inline-block:has(> iframe[src*="fig5_type_s_m_curves"]),
+iframe[src*="fig5_type_s_m_curves"] {
+  min-height: 560px !important;
+  height: 560px !important;
+}
+
+div:has(> iframe[src*="fig5_educational_intervention"]),
+.relative.inline-block:has(> iframe[src*="fig5_educational_intervention"]),
+iframe[src*="fig5_educational_intervention"] {
+  min-height: 540px !important;
+  height: 540px !important;
+}
+
+div:has(> iframe[src*="fig6_rejection_sampling"]),
+.relative.inline-block:has(> iframe[src*="fig6_rejection_sampling"]),
+iframe[src*="fig6_rejection_sampling"] {
+  min-height: 540px !important;
+  height: 540px !important;
+}
+
+div:has(> iframe[src*="fig1_hdi_map"]),
+.relative.inline-block:has(> iframe[src*="fig1_hdi_map"]),
+iframe[src*="fig1_hdi_map"] {
+  min-height: 520px !important;
+  height: 520px !important;
+}
+
+div:has(> iframe[src*="fig1_hdi_scatter_ranks"]),
+.relative.inline-block:has(> iframe[src*="fig1_hdi_scatter_ranks"]),
+iframe[src*="fig1_hdi_scatter_ranks"] {
+  min-height: 510px !important;
+  height: 510px !important;
+}
+
+div:has(> iframe[src*="fig8_sequential_linear_regression"]),
+.relative.inline-block:has(> iframe[src*="fig8_sequential_linear_regression"]),
+iframe[src*="fig8_sequential_linear_regression"] {
+  min-height: 510px !important;
+  height: 510px !important;
+}
+
