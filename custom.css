@@ -163,3 +163,37 @@ td img[data-canonical-url*="dist_icons"] {
   vertical-align: middle !important;
 }
 
+/* Institutional logos banner */
+.institutional-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 32px;
+  padding: 18px 28px;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px;
+  margin: 1.5rem 0 2rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  flex-wrap: wrap;
+}
+
+.institutional-banner a {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.2s ease, opacity 0.2s ease !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+.institutional-banner a:hover {
+  transform: translateY(-2px);
+  opacity: 0.88;
+}
+
+.dark .institutional-banner {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
