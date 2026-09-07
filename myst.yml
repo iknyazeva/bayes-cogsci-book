@@ -102,6 +102,17 @@ project:
       title: 'Session 13: Missing Data, Poststratification & Generalization'
     - file: 14.CompleteEmpiricalAnalysisProtocol.md
       title: 'Session 14: Complete Empirical Analysis & Research Protocol'
+  - title: 'Part VI: Case Studies'
+    children:
+    - file: case_studies/CaseStudies.Overview.md
+      title: 'Case Studies'
+      children:
+      - file: case_studies/CaseStudies.TestosteroneRiskEndowment.md
+        title: 'Case A: Testosterone, Risk-Taking & the Endowment Effect'
+      - file: case_studies/CaseStudies.Cryptomnesia.md
+        title: 'Case B: Cryptomnesia — Unconscious Plagiarism'
+      - file: case_studies/CaseStudies.AmbiguityRT.md
+        title: 'Case C: Semantic Ambiguity & Response Times'
   - title: 'Optional Advanced Block: Inference, Decisions & Workflow'
     children:
     - file: Advanced.BayesianInference.md

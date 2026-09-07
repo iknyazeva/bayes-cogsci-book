@@ -100,6 +100,18 @@ parts:
       - file: 14.CompleteEmpiricalAnalysisProtocol
         title: "Session 14: Complete Empirical Analysis & Research Protocol"
 
+  - caption: "Part VI: Case Studies"
+    chapters:
+      - file: case_studies/CaseStudies.Overview
+        title: "Case Studies"
+        sections:
+          - file: case_studies/CaseStudies.TestosteroneRiskEndowment
+            title: "Case A: Testosterone, Risk-Taking & the Endowment Effect"
+          - file: case_studies/CaseStudies.Cryptomnesia
+            title: "Case B: Cryptomnesia — Unconscious Plagiarism"
+          - file: case_studies/CaseStudies.AmbiguityRT
+            title: "Case C: Semantic Ambiguity & Response Times"
+
   - caption: "Optional Advanced Block: Inference, Decisions & Workflow"
     chapters:
       - file: Advanced.BayesianInference
