@@ -4,8 +4,8 @@
 time — priors, then posteriors, then hierarchies, then diagnostics. Real analysis runs in the
 opposite direction: you meet a messy experiment and must decide *which* tools, *in which order*, and
 *what a result even means*. This part of the book presents real empirical analyses — hormone
-pharmacology, memory misattribution, and response-time modeling — each carried from raw data to
-scientific conclusion in PyMC, and each deliberately chosen to showcase a different family of
+pharmacology, memory misattribution, response-time modeling, creative insight, and bounded
+rating scales — each carried from raw data to scientific conclusion in PyMC, and each deliberately chosen to showcase a different family of
 modeling decisions.
 
 ```{admonition} How to use this part
@@ -17,6 +17,8 @@ Each case study is presented with its complete modeling narrative, diagnostic ch
 | [A. Testosterone & risk-taking](#case-a) | binary choices | a psychological **theory (CPT) compressed into a regressor** |
 | [B. Cryptomnesia](#case-b) | binary attributions | **three crossed random effects** + probability-scale contrasts |
 | [C. Semantic ambiguity & RT](#case-c) | response times | the **likelihood as theory** (ExGaussian), and a convergence rescue |
+| [D. Aha! & creativity](#case-d) | idea scores | **Bayesian mediation** with the causal mediator/covariate discipline |
+| [E. CRAT difficulty ratings](#case-e) | 0–100 slider | **ordered-beta** with boundary mass — writing a custom PyMC likelihood |
 ```
 
 **Prerequisites.** Everything through Session 11 (GLMs, hierarchies, diagnostics). Each case study
@@ -28,7 +30,7 @@ lists its own prerequisites in more detail.
 
 A finished paper shows the model that worked. A finished *analysis* contains everything the paper
 hides: the descriptives that suggested the model, the models that lost the comparison, the sampler
-that refused to converge, the borderline interval you had to word carefully. The three studies in
+that refused to converge, the borderline interval you had to word carefully. The five studies in
 this part were chosen because together they exercise the full craft:
 
 | Decision | Exercised in |
@@ -43,6 +45,12 @@ this part were chosen because together they exercise the full craft:
 | Evidence *for* a null | A (endowment), B (no global self-bias) |
 | Honest borderline reporting | A ($\delta\beta$ barely excluding 0), C (ambiguity cost P = 0.94) |
 | Counterfactual prediction | A (what testosterone *would* do), C (effects in seconds) |
+| Mediation & causal role of covariates | D (sequence demoted from mediator) |
+| Bounded outcomes with boundary mass | E (ordered-beta, custom `CustomDist`) |
+| Distributional regression (precision φ) | E |
+| Observed states instead of latent mixtures | E (guess states) |
+| Within-participant standardization | D |
+
 
 ---
 
@@ -182,9 +190,72 @@ ambiguity increment is +0.06 s with P(>0) = 0.94 — honestly "promising, not ye
 
 ---
 
+---
+
+(case-d)=
+## Case D: Do Aha! Moments Mark Creative Ideas?
+
+**Full chapter:** [Case D: Aha! Moments & Creativity](CaseStudies.Creativity.md)
+*(Moroshkina lab: N = 102 participants, 1,534 ideas)*
+
+**Problem.** Ideas reported with an "Aha!" feel more creative — but both creativity and Aha!
+rise over a brainstorming session. Is the Aha–creativity link anything beyond serial order?
+
+**The clever idea.** A **Bayesian mediation triangle** at the idea level —
+Aha → elaboration → creativity — with the serial-order trend *demoted* from mediator to control
+covariate after a documented causal correction (the sequence index precedes Aha, so it cannot
+sit downstream of it). Effects on within-person-standardized scores; a pre-declared decision
+rule ($P \ge 0.95$).
+
+*Figure CS.0.8 — The mediation decomposition: direct, indirect (via elaboration) and total
+effects of Aha occurrence and intensity (94% HDIs). All paths present at the 0.95 rule — even
+controlling for serial position.*
+
+![creativity mediation](figures/hub/creativity_mediation.png)
+
+| Effect | Value |
+|---|---|
+| Aha → creativity, direct | +0.22 [+0.13, +0.31] SD |
+| Aha → elaboration → creativity | +0.09 [+0.06, +0.12] (≈ 30 % of total) |
+| sequence → creativity (controlled) | +0.04 [−0.01, +0.09] — not present |
+
+---
+
+(case-e)=
+## Case E: Rated Difficulty on a 0–100 Slider — the Ordered-Beta Model
+
+**Full chapter:** [Case E: CRAT & the Ordered-Beta Model](CaseStudies.CRAT.md)
+*(Moroshkina lab: 101 participants × 60 triads, fully crossed)*
+
+**Problem.** Prospective difficulty ratings are bounded *and* spike at the endpoints
+(≈ 6 % exact zeros, ≈ 1 % exact hundreds). Every default likelihood mishandles the spikes.
+
+**The clever idea.** The **ordered-beta** distribution [@kubinec2023] — Beta interior plus
+point masses at both boundaries, one latent location $\eta$ driving all three pieces —
+implemented from scratch as a `pm.CustomDist` with matched `logp` **and** `random` (so PPCs are
+honest). First-stage guesses enter as *observed* states, not a latent mixture.
+
+*Figure CS.0.9 — Ordered-beta PPC: the model reproduces both the histogram shape and the exact
+boundary masses (right panel) — endpoints are modeled, not squeezed away.*
+
+![crat ppc](figures/hub/crat_ppc.png)
+
+*Figure CS.0.10 — Already knowing the answer halves the insight experience: P(Aha) by
+first-stage guess state (crosses = observed rates).*
+
+![crat aha](figures/hub/crat_aha.png)
+
+| Finding | Value |
+|---|---|
+| correct first-stage guess on felt difficulty | ≈ −1.45 on η |
+| P(Aha \| correct guess) vs no guess | 0.34 [0.25, 0.42] vs 0.60 [0.52, 0.69] |
+| persons vs triads (σ on η) | 0.53 vs 0.09 — who you are ≫ what you see |
+
+---
+
 ## Six reusable analysis moves
 
-Distilled from the three studies — each with its minimal code shape.
+Distilled from the five studies — each with its minimal code shape.
 
 ### 1. Compress theory into a regressor
 ```python
@@ -238,6 +309,24 @@ z = pm.ZeroSumNormal("z_participant", sigma=1.0, shape=N_PARTICIPANTS)
 Divergences, $\hat R$, ESS and energy plots are not bureaucracy — in Case C they were the
 difference between noise and science.
 
+### 7. Respect temporal order when naming a mediator
+```python
+# Case D: sequence exists BEFORE the idea's Aha -> covariate, not mediator
+mu_crea = b_crea_aha * aha + b_crea_elab * elab + b_crea_trial * seq + ...
+indirect = b_elab_aha * b_crea_elab          # only downstream mediators here
+```
+A mediator must be measurable after the cause and before the outcome; everything else goes in
+as a covariate — and the broken specification is worth keeping, labeled, in the appendix.
+
+### 8. Model boundary mass instead of squeezing it away
+```python
+# Case E: ordered-beta via CustomDist(logp=..., random=...)
+p_zero, p_one = 1 - sigmoid(eta - k0), sigmoid(eta - k1)
+interior ~ Beta(sigmoid(eta) * phi, (1 - sigmoid(eta)) * phi)
+```
+Exact 0s and exact 100s on a slider are data. `logit((y + .5) / 101)` + Normal hides them and
+produces predictive datasets that never touch the boundaries.
+
 ---
 
 ## The combined analysis checklist
@@ -246,14 +335,14 @@ The union of the three workflows, in execution order:
 
 1. **Write the estimand before the model** — what difference, on what scale, would change your mind?
 2. **EDA with the design**: raw rates/RTs per cell, participant-level variability, skew.
-3. **Choose the likelihood from data + theory** (Bernoulli/lognormal/ExGaussian — Cases A, B, C).
+3. **Choose the likelihood from data + theory** (Bernoulli/lognormal/ExGaussian/ordered-beta — Cases A–E; write a `CustomDist` if needed).
 4. **Enumerate the clustering factors** and give each crossed random intercepts (non-centered).
 5. **Anchor what your design can't identify** — external data, sensitivity check (Case A §5.6).
 6. **Fit a model zoo**, not One Model; compare with LOO/WAIC + PPC calibration + predictive scores.
 7. **Check diagnostics; act on them** — restructure rather than re-run harder (Case C).
 8. **Compute decision-scale contrasts**, directional probabilities, effect sizes at realistic values.
 9. **Predict counterfactually** — what would the model say for unobserved covariate values?
-10. **Report nulls and borderlines honestly** — they are results (Cases A, B, C all contain one).
+10. **Report nulls and borderlines honestly** — they are results (every case contains one).
 
 ---
 
@@ -264,5 +353,7 @@ The union of the three workflows, in execution order:
 | A | prior-predictive check of the choice model; centered vs non-centered geometry; jointly estimate CPT α; add cortisol; sequential analysis |
 | B | re-center treatment coding; list-level lure strength; Savage–Dickey BF for the LogDice slope; per-participant lure sensitivity |
 | C | log-ν link variant; pathology model run longer; ZeroSumNormal removed (watch $\mu_0$ inflate); design simulation for the ambiguity contrast |
+| D | broken-mediation demonstration; reversed triangle; participant Aha-slopes; LOO vs covariate adjustment |
+| E | LOO-prune interactions; φ by triad; retrospective-rating model; deliberately-wrong RNG; effects on the 0–100 scale |
 
 *(Full statements at the end of each case-study chapter.)*

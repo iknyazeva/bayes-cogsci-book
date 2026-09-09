@@ -113,6 +113,10 @@ project:
         title: 'Case B: Cryptomnesia — Unconscious Plagiarism'
       - file: case_studies/CaseStudies.AmbiguityRT.md
         title: 'Case C: Semantic Ambiguity & Response Times'
+      - file: case_studies/CaseStudies.Creativity.md
+        title: 'Case D: Aha! Moments & Creativity'
+      - file: case_studies/CaseStudies.CRAT.md
+        title: 'Case E: CRAT & the Ordered-Beta Model'
   - title: 'Optional Advanced Block: Inference, Decisions & Workflow'
     children:
     - file: Advanced.BayesianInference.md

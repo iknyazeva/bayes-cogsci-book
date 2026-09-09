@@ -111,6 +111,10 @@ parts:
             title: "Case B: Cryptomnesia — Unconscious Plagiarism"
           - file: case_studies/CaseStudies.AmbiguityRT
             title: "Case C: Semantic Ambiguity & Response Times"
+          - file: case_studies/CaseStudies.Creativity
+            title: "Case D: Aha! Moments & Creativity"
+          - file: case_studies/CaseStudies.CRAT
+            title: "Case E: CRAT & the Ordered-Beta Model"
 
   - caption: "Optional Advanced Block: Inference, Decisions & Workflow"
     chapters:
