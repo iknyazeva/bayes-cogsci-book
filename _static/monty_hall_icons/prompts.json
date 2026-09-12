@@ -1,0 +1,17 @@
+{
+  "generator": "Built-in image_gen",
+  "assets": [
+    {
+      "key": "door",
+      "prompt": "Use case: scientific-educational. Asset type: a single square icon for a Monty Hall probability lesson embedded in a Plotly chart. Draw one closed blue game-show door, front view, simple rectangular frame, small brass doorknob, no number. Style: polished flat editorial illustration, thick dark navy outlines, softly rounded corners, minimal shading, crisp readable silhouette at 80 pixels. Centered complete object with generous empty margin, genuinely transparent background. No text, letters, numbers, watermark, floor, room, or other objects."
+    },
+    {
+      "key": "goat",
+      "prompt": "Use case: scientific-educational. Asset type: a single square icon for a Monty Hall probability lesson embedded in a Plotly chart. Draw one friendly cream-colored goat in three-quarter side view, complete body, small curved horns and short beard, recognizable adult goat. Style: polished flat editorial illustration, thick dark navy outlines, softly rounded shapes, minimal shading, crisp readable silhouette at 80 pixels; restrained cream, slate and navy palette. Centered complete animal with generous empty margin, genuinely transparent background. No text, letters, numbers, watermark, floor, scenery, door, or other objects."
+    },
+    {
+      "key": "car",
+      "prompt": "Use case: scientific-educational. Asset type: a single square icon for a Monty Hall probability lesson embedded in a Plotly chart. Draw one coral-red compact prize car in three-quarter front view, complete vehicle, two clearly visible wheels, pale blue windows, no branding. Style: polished flat editorial illustration, thick dark navy outlines, softly rounded shapes, minimal shading, crisp readable silhouette at 80 pixels; restrained coral, pale blue and navy palette. Centered complete vehicle with generous empty margin, genuinely transparent background. No text, letters, numbers, watermark, floor, scenery, door, ribbons, or other objects."
+    }
+  ]
+}

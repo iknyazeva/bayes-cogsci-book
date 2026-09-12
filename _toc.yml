@@ -19,6 +19,11 @@ parts:
             title: "Probability & Bayes Self-Check (Optional)"
       - file: 2.ProbabilityBayesianUpdating
         title: "Lesson 2: How Should Evidence Change Our Expectations?"
+        sections:
+          - file: 2.Quiz(General)
+            title: "Self-Check: Inference Concepts & Distributions"
+          - file: 2.Quiz(BayesianInference)
+            title: "Self-Check: Bayesian Updating"
       - file: 3.GenerativeModelsLikelihoodPrediction
         title: "Session 3: Generative Models, Likelihood & Prediction"
         sections:
@@ -130,12 +135,6 @@ parts:
 
   - caption: "Reference & Practice Appendices"
     chapters:
-      - file: 2.ProbabilityUpdatingAppendix
-        title: "Additional Appendix: Probability Rules & Bayesian Updating"
-      - file: 2.Quiz(General)
-        title: "Self-Check: Inference Concepts"
-      - file: 2.Quiz(BayesianInference)
-        title: "Self-Check: Bayesian Updating"
       - file: 3.DiscreteModelQuiz
         title: "Self-Check: Discrete & Conjugate Models"
       - file: 4.0.ContinuousModuleQuiz

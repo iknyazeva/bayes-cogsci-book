@@ -26,6 +26,11 @@ project:
         title: Probability & Bayes Self-Check (Optional)
     - file: 2.ProbabilityBayesianUpdating.md
       title: 'Lesson 2: How Should Evidence Change Our Expectations?'
+      children:
+      - file: 2.Quiz(General).md
+        title: 'Self-Check: Inference Concepts & Distributions'
+      - file: 2.Quiz(BayesianInference).md
+        title: 'Self-Check: Bayesian Updating'
     - file: 3.GenerativeModelsLikelihoodPrediction.md
       title: 'Session 3: Generative Models, Likelihood & Prediction'
       children:
@@ -130,12 +135,6 @@ project:
         title: Probabilistic Programming & Bayesian Workflow
   - title: Reference & Practice Appendices
     children:
-    - file: 2.ProbabilityUpdatingAppendix.md
-      title: 'Additional Appendix: Probability Rules & Bayesian Updating'
-    - file: 2.Quiz(General).md
-      title: 'Self-Check: Inference Concepts'
-    - file: 2.Quiz(BayesianInference).md
-      title: 'Self-Check: Bayesian Updating'
     - file: 3.DiscreteModelQuiz.md
       title: 'Self-Check: Discrete & Conjugate Models'
     - file: 4.0.ContinuousModuleQuiz.md
