@@ -25,7 +25,7 @@ parts:
           - file: 2.Quiz(BayesianInference)
             title: "Self-Check: Bayesian Updating"
       - file: 3.GenerativeModelsLikelihoodPrediction
-        title: "Session 3: Generative Models, Likelihood & Prediction"
+        title: "Lesson 3: Generative Models, Likelihood & Prediction"
         sections:
           - file: 3.DistributionsInBayes
       - file: 4.PriorsPosteriorPredictiveChecks

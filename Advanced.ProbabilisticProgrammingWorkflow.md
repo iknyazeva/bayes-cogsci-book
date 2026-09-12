@@ -41,7 +41,7 @@ Model revision is expected. The audit trail should retain why each revision occu
 |---|---|
 | What is measured, on which unit, for which population? | Session 1 |
 | What probability statements and updates are required? | Session 2 |
-| How could the observations be generated? | Session 3 |
+| How could the observations be generated? | Lesson 3 |
 | What do the priors imply before observing outcomes? | Session 4 |
 | Can the planned design recover and calibrate the estimand? | Session 5 |
 | Can posterior expectations be computed reliably? | Session 6 |

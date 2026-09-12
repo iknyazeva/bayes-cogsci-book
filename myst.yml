@@ -32,9 +32,12 @@ project:
       - file: 2.Quiz(BayesianInference).md
         title: 'Self-Check: Bayesian Updating'
     - file: 3.GenerativeModelsLikelihoodPrediction.md
-      title: 'Session 3: Generative Models, Likelihood & Prediction'
+      title: 'Lesson 3: Generative Models, Likelihood & Prediction'
       children:
+      - file: 3.GenerativeModelsReference.md
+        title: 'Optional Appendix: Distributions & Prediction'
       - file: 3.DistributionsInBayes.md
+        title: 'Distribution Reference (Optional)'
     - file: 4.PriorsPosteriorPredictiveChecks.md
       title: 'Session 4: Priors, Posterior Uncertainty & Predictive Checks'
       children:
