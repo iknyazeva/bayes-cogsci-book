@@ -27,6 +27,8 @@ parts:
       - file: 3.GenerativeModelsLikelihoodPrediction
         title: "Lesson 3: Generative Models, Likelihood & Prediction"
         sections:
+          - file: 3.GenerativeModelsReference
+            title: "Optional Appendix: Distributions & Prediction"
           - file: 3.DistributionsInBayes
       - file: 4.PriorsPosteriorPredictiveChecks
         title: "Session 4: Priors, Posterior Uncertainty & Predictive Checks"
