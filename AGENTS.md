@@ -5,4 +5,4 @@
 - Update `_wiki/_index.md` and append `_wiki/log.md` whenever documentation changes materially.
 - Do not create note copies, planning documents or staging-note folders in this repository or elsewhere under `/Users/irina/Work/EU/Bayes2026/`.
 - Keep this repository for source content, code, data, executable notebooks, configuration, tests and generated build artefacts.
-
+- Run all Python scripts, tests, notebooks, and build tools using the `pymc_env` conda environment (`conda run -n pymc_env ...`).

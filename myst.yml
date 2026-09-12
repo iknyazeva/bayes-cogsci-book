@@ -14,7 +14,7 @@ project:
   - title: 'Part I: Foundations & Generative Workflow (Sessions 1–4)'
     children:
     - file: 1.ResearchQuestionsDataMeasurement.md
-      title: 'Session 1: Research Questions, Estimands & Measurement'
+      title: 'Lesson 1: Research Questions, Hypothesis Tests & Uncertainty'
       children:
       - file: 1.RandomVariablesRecap.md
         title: Random Variables & the Central Limit Theorem (Optional Recap)
@@ -25,7 +25,7 @@ project:
       - file: 1.ProbabilityBayesQuiz.md
         title: Probability & Bayes Self-Check (Optional)
     - file: 2.ProbabilityBayesianUpdating.md
-      title: 'Session 2: Probability, Likelihood & Bayesian Updating'
+      title: 'Lesson 2: How Should Evidence Change Our Expectations?'
     - file: 3.GenerativeModelsLikelihoodPrediction.md
       title: 'Session 3: Generative Models, Likelihood & Prediction'
       children:
@@ -130,6 +130,8 @@ project:
         title: Probabilistic Programming & Bayesian Workflow
   - title: Reference & Practice Appendices
     children:
+    - file: 2.ProbabilityUpdatingAppendix.md
+      title: 'Additional Appendix: Probability Rules & Bayesian Updating'
     - file: 2.Quiz(General).md
       title: 'Self-Check: Inference Concepts'
     - file: 2.Quiz(BayesianInference).md

@@ -7,7 +7,7 @@ parts:
   - caption: "Part I: Foundations & Generative Workflow (Sessions 1–4)"
     chapters:
       - file: 1.ResearchQuestionsDataMeasurement
-        title: "Session 1: Research Questions, Estimands & Measurement"
+        title: "Lesson 1: Research Questions, Hypothesis Tests & Uncertainty"
         sections:
           - file: 1.RandomVariablesRecap
             title: "Random Variables & the Central Limit Theorem (Optional Recap)"
@@ -18,7 +18,7 @@ parts:
           - file: 1.ProbabilityBayesQuiz
             title: "Probability & Bayes Self-Check (Optional)"
       - file: 2.ProbabilityBayesianUpdating
-        title: "Session 2: Probability, Likelihood & Bayesian Updating"
+        title: "Lesson 2: How Should Evidence Change Our Expectations?"
       - file: 3.GenerativeModelsLikelihoodPrediction
         title: "Session 3: Generative Models, Likelihood & Prediction"
         sections:
@@ -130,6 +130,8 @@ parts:
 
   - caption: "Reference & Practice Appendices"
     chapters:
+      - file: 2.ProbabilityUpdatingAppendix
+        title: "Additional Appendix: Probability Rules & Bayesian Updating"
       - file: 2.Quiz(General)
         title: "Self-Check: Inference Concepts"
       - file: 2.Quiz(BayesianInference)
