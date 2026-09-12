@@ -6,3 +6,4 @@
 - Do not create note copies, planning documents or staging-note folders in this repository or elsewhere under `/Users/irina/Work/EU/Bayes2026/`.
 - Keep this repository for source content, code, data, executable notebooks, configuration, tests and generated build artefacts.
 - Run all Python scripts, tests, notebooks, and build tools using the `pymc_env` conda environment (`conda run -n pymc_env ...`).
+- In all student Colab notebooks (`notebooks/colab/*.ipynb`), load datasets directly from GitHub (`https://raw.githubusercontent.com/iknyazeva/bayes-cogsci-book/main/data/<filename>`) with an automated download if running in Google Colab or if the local file is not present.
