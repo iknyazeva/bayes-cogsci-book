@@ -31,18 +31,16 @@ parts:
             title: "Optional Appendix: Distributions & Prediction"
           - file: 3.DistributionsInBayes
       - file: 4.PriorsPosteriorPredictiveChecks
-        title: "Session 4: Priors, Posterior Uncertainty & Predictive Checks"
+        title: "Lesson 4: What Can We Learn from a Posterior?"
         sections:
-          - file: 4.ConjugatePriors
+          - file: 4.PriorPreparation
+            title: "Appendix 4A: Prior Choice & Updating"
+          - file: 4.ReferencePriors
+            title: "Appendix 4B: Reference, Flat & Jeffreys Priors"
           - file: 4.NormalModels
-          - file: 4.PriorPredictiveDistribution
-          - file: 4.PosteriorPredictiveDistribution
-          - file: 4.NonInformativePriors
-          - file: 4.InverseGammaDistribution
-          - file: 4.JeffreysPrior
-          - file: 4.FisherInformation
+            title: "Appendix 4C: Normal Models & Conjugacy"
           - file: 4.BayesianFrequentistConnections
-          - file: 4.ConjugatesDistributionsToDo
+            title: "Appendix 4D: Bayesian vs Frequentist"
 
   - caption: "Part II: Design & Computation (Sessions 5–6)"
     chapters:

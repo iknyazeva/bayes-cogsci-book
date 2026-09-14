@@ -39,18 +39,16 @@ project:
       - file: 3.DistributionsInBayes.md
         title: 'Distribution Reference (Optional)'
     - file: 4.PriorsPosteriorPredictiveChecks.md
-      title: 'Session 4: Priors, Posterior Uncertainty & Predictive Checks'
+      title: 'Lesson 4: What Can We Learn from a Posterior?'
       children:
-      - file: 4.ConjugatePriors.md
+      - file: 4.PriorPreparation.md
+        title: 'Appendix 4A: Prior Choice & Updating'
+      - file: 4.ReferencePriors.md
+        title: 'Appendix 4B: Reference, Flat & Jeffreys Priors'
       - file: 4.NormalModels.md
-      - file: 4.PriorPredictiveDistribution.md
-      - file: 4.PosteriorPredictiveDistribution.md
-      - file: 4.NonInformativePriors.md
-      - file: 4.InverseGammaDistribution.md
-      - file: 4.JeffreysPrior.md
-      - file: 4.FisherInformation.md
+        title: 'Appendix 4C: Normal Models & Conjugacy'
       - file: 4.BayesianFrequentistConnections.md
-      - file: 4.ConjugatesDistributionsToDo.md
+        title: 'Appendix 4D: Bayesian vs Frequentist'
   - title: 'Part II: Design & Computation (Sessions 5–6)'
     children:
     - file: 5.SimulationParameterRecoveryDesign.md
