@@ -49,6 +49,8 @@ project:
         title: 'Appendix 4C: Normal Models & Conjugacy'
       - file: 4.BayesianFrequentistConnections.md
         title: 'Appendix 4D: Bayesian vs Frequentist'
+      - file: 4.Homework_ConjugatePractice.md
+        title: 'Appendix 4E: Homework & Practice'
   - title: 'Part II: Design & Computation (Sessions 5–6)'
     children:
     - file: 5.SimulationParameterRecoveryDesign.md
