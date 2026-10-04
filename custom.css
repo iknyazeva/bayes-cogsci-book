@@ -248,3 +248,91 @@ td img[data-canonical-url*="dist_icons"] {
   transform: translateY(-1px);
 }
 
+
+/* ------------------------------------------------------------------
+   Language switcher: site.nav (EN | RU) shown as tabs next to the title.
+   The English and Russian books are separate MyST projects (/en, /ru);
+   the active language carries aria-current="page".
+   ------------------------------------------------------------------ */
+div:has(> .myst-top-nav-item) {
+  display: flex !important;
+  flex-grow: 0 !important;
+  align-items: center;
+  margin-left: 0.25rem;
+}
+
+.myst-top-nav-item {
+  display: inline-flex !important;
+  margin: 0 !important;
+}
+
+.myst-top-nav-item > a {
+  margin: 0 !important;
+  width: auto !important;
+  padding: 0.3rem 0.9rem !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff;
+  color: #2b6cb0 !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em;
+  text-decoration: none !important;
+}
+
+.myst-top-nav-item:first-child > a {
+  border-radius: 8px 0 0 8px;
+}
+
+.myst-top-nav-item:last-child > a {
+  border-radius: 0 8px 8px 0;
+  border-left: none !important;
+}
+
+.myst-top-nav-item > a[aria-current="page"] {
+  background: #2b6cb0 !important;
+  border-color: #2b6cb0 !important;
+  color: #ffffff !important;
+}
+
+.dark .myst-top-nav-item > a {
+  background: transparent;
+  color: #90cdf4 !important;
+  border-color: #4a5568 !important;
+}
+
+.dark .myst-top-nav-item > a[aria-current="page"] {
+  background: #2b6cb0 !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 760px) {
+  .myst-home-link span:not(.sr-only) {
+    display: none !important;
+  }
+}
+
+/* Narrow screens: keep the logo, title and language tabs inside the viewport */
+@media (max-width: 760px) {
+  .myst-home-link-logo img,
+  .myst-home-link img,
+  a.myst-home-link img {
+    height: 2.4rem !important;
+    min-height: 0 !important;
+    max-height: 2.4rem !important;
+    max-width: 36vw !important;
+    padding: 1px 3px !important;
+  }
+  .myst-top-nav-item > a {
+    padding: 0.2rem 0.55rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+@media (max-width: 760px) {
+  h1 {
+    font-size: 1.7rem !important;
+    line-height: 1.2 !important;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+}

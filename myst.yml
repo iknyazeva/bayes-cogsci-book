@@ -9,6 +9,7 @@ project:
   - notebooks/*
   - AGENTS.md
   - logo-concepts/*
+  - ru/*
   toc:
   - file: 0.Course_overview.md
   - title: 'Part I: Foundations & Generative Workflow (Sessions 1–4)'
@@ -51,21 +52,28 @@ project:
         title: 'Appendix 4D: Bayesian vs Frequentist'
       - file: 4.Homework_ConjugatePractice.md
         title: 'Appendix 4E: Homework & Practice'
-  - title: 'Part II: Design & Computation (Sessions 5–6)'
+  - title: 'Part II: Sampling & Computation (Lessons 5–6)'
     children:
-    - file: 5.SimulationParameterRecoveryDesign.md
-      title: 'Session 5: Simulation, Parameter Recovery & Research Design'
-      children:
-      - file: 5.ParameterRecoveryCalibration.md
-      - file: 5.PowerAnalysisBayesianDesignSimulation.md
-      - file: 5.SampleAllocationDesigns.md
-    - file: 6.BayesianComputationMCMC.md
-      title: 'Session 6: Bayesian Computation (Monte Carlo, MCMC, HMC & NUTS)'
+    - file: 5.MonteCarloToMCMC.md
+      title: 'Lesson 5: Why Is a Posterior Hard to Compute? From Monte Carlo to MCMC'
       children:
       - file: 6.MonteCarloEstimation.md
+        title: 'Going Further: Monte Carlo Estimation'
       - file: 6.MarkovChains.md
+        title: 'Going Further: Markov Chains'
       - file: 6.MetropolisHastings.md
+        title: 'Going Further: Metropolis–Hastings'
       - file: 6.GibbsSampling.md
+        title: 'Going Further: Gibbs Sampling'
+      - file: 5.HamiltonianMonteCarloNUTS.md
+        title: 'Going Further: Hamiltonian Monte Carlo & NUTS'
+    - file: 6.RunningSamplerTrustChecks.md
+      title: 'Lesson 6: Running a Sampler — Convergence, Trust Checks & Approximations'
+      children:
+      - file: 6.AssessingConvergence.md
+        title: 'Going Further: Convergence Diagnostics & Remedies'
+      - file: 6.VariationalInference.md
+        title: 'Going Further: Laplace Approximation & Variational Inference'
   - title: 'Part III: Applied Models & Hierarchies (Sessions 7–10)'
     children:
     - file: 7.ContinuousOutcomesRobustModels.md
@@ -95,13 +103,16 @@ project:
       - file: 10.PartialPoolingChimpanzees.md
       - file: 10.MixedModelsVsHierarchicalBayes.md
         title: Frequentist Mixed Models vs. Hierarchical Bayes (Reference)
-  - title: 'Part IV: Diagnostics & Model Checking (Session 11)'
+  - title: 'Part IV: Design & Model Checking (Lesson 11)'
     children:
-    - file: 11.DiagnosticsPPCModelComparison.md
-      title: 'Session 11: Diagnostics, PPC & Predictive Model Comparison'
+    - file: 11.SimulationParameterRecoveryDesign.md
+      title: 'Lesson 11: Simulation, Parameter Recovery & Research Design'
       children:
-      - file: 6.AssessingConvergence.md
-        title: MCMC Convergence Diagnostics & Sampler Checks (Reference)
+      - file: 11.ParameterRecoveryCalibration.md
+      - file: 11.PowerAnalysisBayesianDesignSimulation.md
+      - file: 11.SampleAllocationDesigns.md
+      - file: 11.DiagnosticsPPCModelComparison.md
+        title: 'Predictive Checks & Model Comparison'
   - title: 'Part V: Causality, Generalization & Synthesis (Sessions 12–14)'
     children:
     - file: 12.CausalInference.md
@@ -130,8 +141,6 @@ project:
     - file: Advanced.BayesianInference.md
       title: Advanced Bayesian Inference & Decision-Making
       children:
-      - file: Advanced.VariationalInference.md
-        title: Variational Inference
       - file: Advanced.DecisionTheoryPrediction.md
         title: Bayesian Decision Theory & Prediction
       - file: Advanced.ProbabilisticProgrammingWorkflow.md
@@ -148,10 +157,18 @@ project:
   - _static
 site:
   template: book-theme
+  projects:
+    - slug: en
+      path: .
+    - slug: ru
+      path: ru
+  nav:
+    - title: EN
+      url: /en
+    - title: RU
+      url: /ru
   options:
     logo: logo.png
     logo_text: Bayesian Analysis of Empirical Data
+    logo_url: /en
     style: custom.css
-    nav:
-    - title: GitHub
-      url: https://github.com/iknyazeva/bayes-cogsci-book

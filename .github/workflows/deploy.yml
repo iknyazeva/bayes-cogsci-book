@@ -47,6 +47,9 @@ jobs:
           myst build --html
           test -d _build/html || { echo "ERROR: _build/html not generated"; exit 1; }
 
+      - name: Post-process two-language site (EN /en, RU /ru)
+        run: python3 scripts/postbuild_site.py
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

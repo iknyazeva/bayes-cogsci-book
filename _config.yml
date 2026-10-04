@@ -19,6 +19,7 @@ sphinx:
       - "notebooks/*"
       - "AGENTS.md"
       - "logo-concepts/*"
+      - "ru/*"
 
 # Define the name of the latex output file for PDF builds
 latex:

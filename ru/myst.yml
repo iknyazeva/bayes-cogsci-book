@@ -1,0 +1,41 @@
+version: 1
+project:
+  title: Байесовский анализ эмпирических данных
+  github: https://github.com/iknyazeva/bayes-cogsci-book
+  bibliography:
+    - ../references.bib
+  toc:
+  - file: 0.Course_overview.md
+    title: 'Обзор курса'
+  - title: 'Часть I. Основы (занятия 1–4)'
+    children:
+    - file: 1.ResearchQuestionsDataMeasurement.md
+      title: 'Занятие 1. Исследовательские вопросы, проверка гипотез и неопределённость'
+    - file: 2.ProbabilityBayesianUpdating.md
+      title: 'Занятие 2. Как данные должны менять наши ожидания?'
+    - file: 3.GenerativeModelsLikelihoodPrediction.md
+      title: 'Занятие 3. Порождающие модели, правдоподобие и предсказание'
+    - file: 4.PriorsPosteriorPredictiveChecks.md
+      title: 'Занятие 4. Что можно узнать из апостериорного распределения?'
+  - title: 'Часть II. Сэмплирование и вычисления (занятия 5–6)'
+    children:
+    - file: 5.MonteCarloToMCMC.md
+      title: 'Занятие 5. Почему апостериорное трудно вычислить? От Монте-Карло к MCMC'
+      children:
+      - file: 6.MonteCarloEstimation.md
+        title: 'Дополнительно: оценивание методом Монте-Карло'
+      - file: 6.MarkovChains.md
+        title: 'Дополнительно: марковские цепи'
+      - file: 6.MetropolisHastings.md
+        title: 'Дополнительно: алгоритм Метрополиса–Гастингса'
+      - file: 6.GibbsSampling.md
+        title: 'Дополнительно: сэмплирование по Гиббсу'
+      - file: 5.HamiltonianMonteCarloNUTS.md
+        title: 'Дополнительно: гамильтонов Монте-Карло и NUTS'
+    - file: 6.RunningSamplerTrustChecks.md
+      title: 'Занятие 6. Запускаем сэмплер: сходимость, проверки доверия и приближения'
+      children:
+      - file: 6.AssessingConvergence.md
+        title: 'Дополнительно: диагностика сходимости и что делать при сбоях'
+      - file: 6.VariationalInference.md
+        title: 'Дополнительно: лапласовская аппроксимация и вариационный вывод'

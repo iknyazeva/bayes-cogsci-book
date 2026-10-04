@@ -44,21 +44,28 @@ parts:
           - file: 4.Homework_ConjugatePractice
             title: "Appendix 4E: Homework & Practice"
 
-  - caption: "Part II: Design & Computation (Sessions 5–6)"
+  - caption: "Part II: Sampling & Computation (Lessons 5–6)"
     chapters:
-      - file: 5.SimulationParameterRecoveryDesign
-        title: "Session 5: Simulation, Parameter Recovery & Research Design"
-        sections:
-          - file: 5.ParameterRecoveryCalibration
-          - file: 5.PowerAnalysisBayesianDesignSimulation
-          - file: 5.SampleAllocationDesigns
-      - file: 6.BayesianComputationMCMC
-        title: "Session 6: Bayesian Computation (Monte Carlo, MCMC, HMC & NUTS)"
+      - file: 5.MonteCarloToMCMC
+        title: "Lesson 5: Why Is a Posterior Hard to Compute? From Monte Carlo to MCMC"
         sections:
           - file: 6.MonteCarloEstimation
+            title: "Going Further: Monte Carlo Estimation"
           - file: 6.MarkovChains
+            title: "Going Further: Markov Chains"
           - file: 6.MetropolisHastings
+            title: "Going Further: Metropolis–Hastings"
           - file: 6.GibbsSampling
+            title: "Going Further: Gibbs Sampling"
+          - file: 5.HamiltonianMonteCarloNUTS
+            title: "Going Further: Hamiltonian Monte Carlo & NUTS"
+      - file: 6.RunningSamplerTrustChecks
+        title: "Lesson 6: Running a Sampler — Convergence, Trust Checks & Approximations"
+        sections:
+          - file: 6.AssessingConvergence
+            title: "Going Further: Convergence Diagnostics & Remedies"
+          - file: 6.VariationalInference
+            title: "Going Further: Laplace Approximation & Variational Inference"
 
   - caption: "Part III: Applied Models & Hierarchies (Sessions 7–10)"
     chapters:
@@ -90,13 +97,16 @@ parts:
           - file: 10.MixedModelsVsHierarchicalBayes
             title: "Frequentist Mixed Models vs. Hierarchical Bayes (Reference)"
 
-  - caption: "Part IV: Diagnostics & Model Checking (Session 11)"
+  - caption: "Part IV: Design & Model Checking (Lesson 11)"
     chapters:
-      - file: 11.DiagnosticsPPCModelComparison
-        title: "Session 11: Diagnostics, PPC & Predictive Model Comparison"
+      - file: 11.SimulationParameterRecoveryDesign
+        title: "Lesson 11: Simulation, Parameter Recovery & Research Design"
         sections:
-          - file: 6.AssessingConvergence
-            title: "MCMC Convergence Diagnostics & Sampler Checks (Reference)"
+          - file: 11.ParameterRecoveryCalibration
+          - file: 11.PowerAnalysisBayesianDesignSimulation
+          - file: 11.SampleAllocationDesigns
+          - file: 11.DiagnosticsPPCModelComparison
+            title: "Predictive Checks & Model Comparison"
 
   - caption: "Part V: Causality, Generalization & Synthesis (Sessions 12–14)"
     chapters:
@@ -128,8 +138,6 @@ parts:
       - file: Advanced.BayesianInference
         title: "Advanced Bayesian Inference & Decision-Making"
         sections:
-          - file: Advanced.VariationalInference
-            title: "Variational Inference"
           - file: Advanced.DecisionTheoryPrediction
             title: "Bayesian Decision Theory & Prediction"
           - file: Advanced.ProbabilisticProgrammingWorkflow

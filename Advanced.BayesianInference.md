@@ -35,7 +35,7 @@ After completing the block, students should be able to:
 | Required course material | Advanced extension |
 |---|---|
 | Session 5: simulation and calibration | Simulation-based assessment of approximation error and decision performance |
-| Session 6: MCMC, HMC, and NUTS | {doc}`Advanced.VariationalInference` |
+| Session 6: MCMC, HMC, and NUTS | {doc}`6.VariationalInference` (now a further-reading page of Lesson 6) |
 | Sessions 7–10: applied and hierarchical models | A realistic model whose posterior may be expensive to approximate |
 | Session 11: PPC, cross-validation, and model uncertainty | {doc}`Advanced.DecisionTheoryPrediction` |
 | Session 14: complete analysis protocol | {doc}`Advanced.ProbabilisticProgrammingWorkflow` |
@@ -67,7 +67,7 @@ The course's Module 3 transcripts and Gaussian-process notebook were also review
 
 ## Recommended route
 
-1. Read {doc}`Advanced.VariationalInference` and compare VI with NUTS on a model whose exact posterior or trusted MCMC fit is available.
+1. Read {doc}`6.VariationalInference` (Lesson 6) and compare VI with NUTS on a model whose exact posterior or trusted MCMC fit is available.
 2. Read {doc}`Advanced.DecisionTheoryPrediction` and make one decision from the same posterior predictive distribution under two different loss functions.
 3. Use {doc}`Advanced.ProbabilisticProgrammingWorkflow` to audit the entire analysis from construct and estimand to final action and reproducibility record.
 
