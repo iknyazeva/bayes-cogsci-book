@@ -98,7 +98,10 @@ prose with a raw iframe using a path relative to the rendered page:
 <iframe src="../_static/lesson4_rope.html" width="100%" height="420px" style="border:none; border-radius:8px;"></iframe>
 ```
 
-`_static` is registered via `project.static_files` in `myst.yml`. Naming is `fig<session>_<slug>.html` or
+`_static` is registered via `project.static_files` in `myst.yml`. mystmd drops the iframe `height` attribute, so the
+real height comes from CSS: `scripts/sync_iframe_heights.py` reads each iframe's `height` from the Markdown (raised to the
+figure's own Plotly layout height if larger) and writes one rule per figure into a generated block of `custom.css`.
+Run it after adding or resizing a figure; CI also runs it before the build. Naming is `fig<session>_<slug>.html` or
 `lesson<N>_<slug>.html`. To change a figure, edit the generating script and re-run it — never hand-edit the
 HTML in `_static/`.
 
