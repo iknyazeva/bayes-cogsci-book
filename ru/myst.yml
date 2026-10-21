@@ -39,3 +39,37 @@ project:
         title: 'Дополнительно: диагностика сходимости и что делать при сбоях'
       - file: 6.VariationalInference.md
         title: 'Дополнительно: лапласовская аппроксимация и вариационный вывод'
+  - title: 'Часть III. Прикладные модели и иерархии (занятия 7–10)'
+    children:
+    - file: 7.ContinuousOutcomesRobustModels.md
+      title: 'Занятие 7. Непрерывные исходы, робастные модели и сравнение двух групп'
+      children:
+      - file: 7.ComparingMeansBEST.md
+        title: 'Дополнительно: модель BEST для оценивания различий групп'
+      - file: 7.BayesianTtestBayesFactor.md
+        title: 'Дополнительно: проверка точечных гипотез и фактор Байеса'
+    - file: 8.RegressionInteractionsPrediction.md
+      title: 'Занятие 8. Регрессия, взаимодействия и условные предсказания'
+      children:
+      - file: 7.BayesianANOVA.md
+        title: 'Дополнительно: категориальные предикторы и факторные контрасты'
+      - file: 8.LinearRegression.md
+        title: 'Математический справочник: матричная байесовская регрессия'
+    - file: 10.HierarchicalModelsPartialPooling.md
+      title: 'Занятие 9. Повторные наблюдения и иерархические модели'
+      children:
+      - file: 10.MixedModelsVsHierarchicalBayes.md
+        title: 'Дополнительно: классические смешанные модели и байесовская иерархия'
+    - file: 9.GeneralizedLinearModels.md
+      title: 'Занятие 10. Бинарные исходы и обобщённые линейные модели (GLM)'
+      children:
+      - file: 10.PartialPoolingChimpanzees.md
+        title: 'Итоговый кейс: просоциальное поведение шимпанзе'
+      - file: 9.LogisticRegression.md
+        title: 'Дополнительно: логистическая регрессия и отношения шансов'
+      - file: 9.PoissonRegression.md
+        title: 'Дополнительно: счётные данные и пуассоновская регрессия'
+      - file: 9.OrderedLogisticRegression.md
+        title: 'Дополнительно: порядковая логистическая регрессия'
+      - file: 9.ExponentialData.md
+        title: 'Дополнительно: длительности и времена ожидания'

@@ -67,35 +67,40 @@ parts:
           - file: 6.VariationalInference
             title: "Going Further: Laplace Approximation & Variational Inference"
 
-  - caption: "Part III: Applied Models & Hierarchies (Sessions 7–10)"
+  - caption: "Part III: Applied Models & Hierarchies (Lessons 7–10)"
     chapters:
       - file: 7.ContinuousOutcomesRobustModels
-        title: "Session 7: Continuous Outcomes & Robust Models"
+        title: "Lesson 7: Continuous Outcomes, Robust Models & Two-Group Differences"
         sections:
           - file: 7.ComparingMeansBEST
-          - file: 9.ExponentialData
-            title: "Positive Outcomes & Duration Models"
+            title: "Going Further: Two-Group Estimation & The BEST Model"
           - file: 7.BayesianTtestBayesFactor
-            title: "Bayes Factors & Two-Sample Testing (Optional)"
+            title: "Going Further: Point-Null Testing & The Savage–Dickey Bayes Factor"
       - file: 8.RegressionInteractionsPrediction
-        title: "Session 8: Regression, Interactions & Conditional Prediction"
+        title: "Lesson 8: Regression, Interactions & Conditional Prediction"
         sections:
           - file: 7.BayesianANOVA
-            title: "Categorical Predictors & Factorial Contrasts"
+            title: "Going Further: Categorical Predictors & Cell-Means Contrasts"
           - file: 8.LinearRegression
-            title: "Matrix Regression & Analytic Foundations (Reference)"
-      - file: 9.GeneralizedLinearModels
-        title: "Session 9: Generalized Linear Models (GLMs)"
-        sections:
-          - file: 9.LogisticRegression
-          - file: 9.PoissonRegression
-          - file: 9.OrderedLogisticRegression
+            title: "Mathematical Reference: Matrix Bayesian Regression"
       - file: 10.HierarchicalModelsPartialPooling
-        title: "Session 10: Hierarchical Models & Partial Pooling"
+        title: "Lesson 9: Repeated Observations & Hierarchical Models"
+        sections:
+          - file: 10.MixedModelsVsHierarchicalBayes
+            title: "Going Further: Classical Mixed Models vs. Hierarchical Bayes"
+      - file: 9.GeneralizedLinearModels
+        title: "Lesson 10: Binary Outcomes & Generalized Linear Models"
         sections:
           - file: 10.PartialPoolingChimpanzees
-          - file: 10.MixedModelsVsHierarchicalBayes
-            title: "Frequentist Mixed Models vs. Hierarchical Bayes (Reference)"
+            title: "Capstone Case Study: Prosocial Chimpanzees"
+          - file: 9.LogisticRegression
+            title: "Going Further: Logistic Regression & Odds Ratios"
+          - file: 9.PoissonRegression
+            title: "Going Further: Event Counts & Overdispersion"
+          - file: 9.OrderedLogisticRegression
+            title: "Going Further: Ordered Categorical Responses"
+          - file: 9.ExponentialData
+            title: "Going Further: Positive Durations & Waiting Times"
 
   - caption: "Part IV: Design & Model Checking (Lesson 11)"
     chapters:
