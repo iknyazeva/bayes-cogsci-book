@@ -1,18 +1,26 @@
-"""Build the Lesson 9 Going Further workbook: classical mixed models vs. hierarchical Bayes.
+"""Build the Lesson 9 Going Further workbook: a faithful transfer of the legacy
+course notebook `BayesianModelsMaterials/notebooks/10_MixedModel(Linear).ipynb`.
 
-Full transfer of the legacy course notebook `10_MixedModel(Linear).ipynb`
-(BayesianModelsMaterials) after the 2026-10-28 revision: the classical ladder
-(pooled OLS -> subject dummies -> random intercept -> random intercept+slope),
-residual diagnostics, the estimated random-effect covariance, a corrected
-pointwise CI band for the population line, and the Bayesian Bambi + PSIS-LOO
-comparison. Optional homework: dietox pigs.
+The Russian workbook reproduces the original notebook cell-by-cell (original
+texts, original plots, homework). Only documented corrections are applied:
+- Durbin-Watson wording (autocorrelation, not collinearity);
+- sigma_b computed from cov_re instead of a hardcoded np.sqrt(1378);
+- fixed swapped Obs/Obs band labels in the OLS prediction plot;
+- the "CI band" built from joint CI corners is replaced by a correct pointwise
+  band using the covariance of the fixed effects;
+- statsmodels DOES estimate the random-effect covariance (re_formula="~ Days");
+  the model correlation rho is read from cov_re, not from the BLUP scatter;
+- az.waic / plot_compare(insample_dev=...) replaced by PSIS-LOO API (ArviZ 1.x);
+- seeds for the Bambi fits; pandas-3-compatible groupby; data loads from the
+  book repository.
+Non-content leftovers removed (np.log demo cells, bare displays, duplicated plot).
 
 Run from the book root with the pymc_env environment:
     /opt/homebrew/Caskroom/miniforge/base/envs/pymc_env/bin/python scripts/build_lesson9_mixed_models_notebooks.py
 
 Outputs:
-    notebooks/colab/09_mixed_models_linear.ipynb
-    notebooks/colab/09_mixed_models_linear_ru.ipynb
+    notebooks/colab/09_mixed_models_linear.ipynb        (English)
+    notebooks/colab/09_mixed_models_linear_ru.ipynb     (Russian, primary transfer)
 """
 
 from __future__ import annotations
@@ -34,182 +42,200 @@ FILES = {
 CELLS: list[tuple[str, dict[str, str]]] = []
 
 
-def md(en: str, ru: str | None = None) -> None:
-    CELLS.append(("markdown", {"en": en, "ru": ru if ru is not None else en}))
+def md(ru: str, en: str | None = None) -> None:
+    CELLS.append(("markdown", {"ru": ru, "en": en if en is not None else ru}))
 
 
-def code(en: str, ru: str | None = None) -> None:
-    CELLS.append(("code", {"en": en, "ru": ru if ru is not None else en}))
+def code(ru: str, en: str | None = None) -> None:
+    CELLS.append(("code", {"ru": ru, "en": en if en is not None else ru}))
 
 
 # ---------------------------------------------------------------------------
-# Header
+# Header (workbook wrapper around the original notebook)
 # ---------------------------------------------------------------------------
 md(
-    f"""# Lesson 9 (Going Further): Classical Mixed Models vs. Hierarchical Bayes
-### Student Laboratory Workbook
-*Course: Bayesian Analysis of Empirical Data (2026)*
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({GITHUB}{FILES['en']})
-*Russian version: [{FILES['ru']}]({GITHUB}{FILES['ru']})*
-
-This companion to the *Mixed Models vs. Hierarchical Bayes* page rebuilds the **entire classical ladder** on the `sleepstudy` data: a pooled OLS regression, subject dummy fixed effects, a random-intercept `MixedLM`, and a random-intercept-plus-slope `MixedLM` with an **estimated covariance** between the random effects. We then repeat the two Bayesian hierarchical models in Bambi and compare them with PSIS-LOO. Along the way we fix three classic traps of the classical workflow: what Durbin–Watson actually measures, how to build a correct confidence band for the population line, and why BLUP scatter-plots are not the model-estimated correlation.
-""",
-    f"""# Занятие 9 (дополнительно): классические смешанные модели против байесовской иерархии
-### Рабочая тетрадь студента
-*Курс: Байесовский анализ эмпирических данных (2026)*
+    f"""# Смешанные модели (mixed models). Они же multilevel models. Они же hierarchical models
 
 [![Открыть в Colab](https://colab.research.google.com/assets/colab-badge.svg)]({GITHUB}{FILES['ru']})
 *English version: [{FILES['en']}]({GITHUB}{FILES['en']})*
 
-Это приложение к странице «Классические смешанные модели и байесовская иерархия». Мы пройдём **всю классическую лестницу** на данных `sleepstudy`: объединённая OLS-регрессия, фиксированные дамми-эффекты испытуемых, `MixedLM` со случайным интерсептом и `MixedLM` со случайным интерсептом и наклоном, включая **оцениваемую ковариацию** случайных эффектов. Затем повторим две байесовские иерархические модели в Bambi и сравним их по PSIS-LOO. По пути разберём три классические ловушки: что на самом деле измеряет статистика Дарбина–Уотсона, как строить корректный доверительный коридор для популяционной прямой и почему диаграмма рассеяния BLUP — это не оценка корреляции из модели.
+Эта рабочая тетрадь — приложение к занятию 9 «Повторные наблюдения и иерархические модели» и странице «Классические смешанные модели и байесовская иерархия». В ней мы проходим весь путь по данным о депривации сна `sleepstudy`: от обычной линейной регрессии к моделям со случайными эффектами и далее к байесовским иерархическим моделям в Bambi.
+""",
+    f"""# Mixed models. Also known as multilevel models, also known as hierarchical models
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({GITHUB}{FILES['en']})
+*Russian version: [{FILES['ru']}]({GITHUB}{FILES['ru']})*
+
+This workbook accompanies Lesson 9 (Repeated Observations & Hierarchical Models) and the "Classical Mixed Models vs. Hierarchical Bayes" page. Using the `sleepstudy` sleep-deprivation data, we go all the way from ordinary linear regression to random-effects models and then to Bayesian hierarchical models in Bambi.
 """,
 )
 
 # ---------------------------------------------------------------------------
-# Setup
+# Cell 0: imports (original + install guards + repo data loading)
 # ---------------------------------------------------------------------------
 code(
-    """import sys, os, subprocess
+    """import sys, subprocess
+
+try:
+    import pingouin as pg
+except ImportError:
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "pingouin"])
+    import pingouin as pg
+
+import arviz as az
+import seaborn as sns
+import bambi as bmb
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy import stats
-
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
+from scipy import stats
 from statsmodels.stats.stattools import durbin_watson
 from statsmodels.graphics.gofplots import qqplot
 
-try:
-    import arviz as az
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "arviz>=0.14.0"])
-    import arviz as az
-
-try:
-    import bambi as bmb
-except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "bambi>=0.13.0"])
-    import bambi as bmb
-
 RANDOM_SEED = 2026
-rng = np.random.default_rng(RANDOM_SEED)
-plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
 
-# Data: sleepstudy (Belenky et al., 2003), canonical copy in the book repository.
-DATA_URL = "https://raw.githubusercontent.com/iknyazeva/bayes-cogsci-book/main/data/sleepstudy.csv"
+az.style.use("arviz-darkgrid")
+
+# Данные: sleepstudy (Belenky et al., 2003) — каноническая копия в репозитории курса
+import os, urllib.request
 DATA_PATH = "data/sleepstudy.csv"
 os.makedirs("data", exist_ok=True)
 if not os.path.exists(DATA_PATH):
-    try:
-        df_sleep = bmb.load_data("sleepstudy")
-        df_sleep.to_csv(DATA_PATH, index=False)
-    except Exception:
-        import urllib.request
-        urllib.request.urlretrieve(DATA_URL, DATA_PATH)
-
-print("Environment ready: statsmodels", sm.__version__, "| Bambi", bmb.__version__, "| ArviZ", az.__version__)
+    url = "https://raw.githubusercontent.com/iknyazeva/bayes-cogsci-book/main/data/sleepstudy.csv"
+    urllib.request.urlretrieve(url, DATA_PATH)
 """
 )
 
 # ---------------------------------------------------------------------------
-# Section 1: clustered data
+# Cell 3: intro (original text, typos fixed)
 # ---------------------------------------------------------------------------
 md(
-    """## 1. Clustered Data and the Research Question
+    """Когда говорили про условия, которые должны выполняться для линейной модели, то отмечали отдельно требование независимости данных друг от друга. Это действительно важное требование. Если оно нарушается, то оценки модели будут некорректными и вы не сможете делать выводов.
 
-### The Idea
-Linear models assume independent observations. Repeated measurements break this assumption: reaction times of one person share that person's brain, habits and baseline speed. Any situation with clusters — repeated measurements over time, several schools, several clinics — produces **within-cluster correlation**, and treating such data as $N$ independent points makes the inference wrong. Our research question: how does reaction time change with days of sleep deprivation, both *on average in the population* and *for each individual subject*?
+Но очень часто наблюдения бывают объединены в группы по какому-то признаку:
+- одни и те же измерения в разные периоды времени;
+- измерения проводятся в нескольких организациях (например, исследования на группах в нескольких школах);
+- повторные измерения для одного и того же человека.
 
-### Example
-The `sleepstudy` experiment (Belenky et al., 2003): 18 subjects slept normally the night before day 0, then only 3 hours per night for 9 consecutive days; each day their mean reaction time (ms) was measured. That gives a balanced panel: 18 subjects $\\times$ 10 days $= 180$ observations.
+То есть любая ситуация, где есть основание предполагать наличие кластера и внутрикластерной корреляции.
+
+Начнём с примера, который есть во многих пакетах.
+
+## Недосып и время реакции
+
+Эксперимент: в ночь перед началом исследования всем испытуемым давали поспать нормальное время, а последующие 9 дней — только по 3 часа. Каждый день измеряли время реакции в серии тестов.
+
+Исследовательский вопрос: как время реакции меняется с продолжительностью бессонницы.
 """,
-    """## 1. Кластеризованные данные и исследовательский вопрос
+    """When we discussed the conditions that a linear model has to satisfy, we singled out the requirement that observations be independent of each other. This is a genuinely important requirement: when it is violated, the model's estimates are incorrect and no valid conclusions can be drawn.
 
-### Идея
-Линейная модель предполагает независимость наблюдений. Повторные измерения нарушают это условие: времена реакции одного человека объединены общим мозгом, привычками и базовой скоростью. Любая ситуация с кластерами — повторные измерения во времени, несколько школ, несколько клиник — порождает **внутрикластерную корреляцию**, и обращение с такими данными как с $N$ независимыми точками делает выводы некорректными. Наш исследовательский вопрос: как время реакции меняется с днями депривации сна — и *в среднем по популяции*, и *у каждого отдельного испытуемого*?
+Very often, however, observations are grouped by some attribute:
+- the same measurements taken at different time points;
+- measurements collected in several organizations (for example, studies run in several schools);
+- repeated measurements for the same person.
 
-### Пример
-Эксперимент `sleepstudy` (Belenky et al., 2003): 18 участников спали нормально ночь перед днём 0, затем только по 3 часа в сутки 9 дней подряд; каждый день измерялось среднее время реакции (мс). Получается сбалансированная панель: 18 участников $\\times$ 10 дней $= 180$ наблюдений.
+That is, any situation where there is reason to expect clusters and within-cluster correlation.
+
+Let us start with an example available in many packages.
+
+## Sleep deprivation and reaction time
+
+Experiment: on the night before the study every subject got a full night of sleep; on each of the following 9 nights only 3 hours. Every day, reaction time was measured in a series of tests.
+
+Research question: how does reaction time change with the duration of sleep deprivation.
 """,
 )
 
 code(
     """data = pd.read_csv(DATA_PATH)
-data["Subject"] = data["Subject"].astype("category")
-print(data.head())
-print("\\nObservations per subject (balanced panel):")
-print(data["Subject"].value_counts().sort_index().to_string())
-
-# Per-subject trajectories: the whole story is visible in this panel
-subjects = list(data["Subject"].unique())
-fig, axes = plt.subplots(2, 9, figsize=(16, 7), sharey=True, sharex=True)
-for ax, subj in zip(axes.ravel(), subjects):
-    sub = data[data["Subject"] == subj]
-    ax.scatter(sub["Days"], sub["Reaction"], color="C0", ec="black", alpha=0.7, s=22)
-    m, b = np.polyfit(sub["Days"], sub["Reaction"], 1)
-    ax.plot(sub["Days"], b + m * sub["Days"], color="C3", lw=1.5)
-    ax.set_title(str(subj), fontsize=9)
-fig.suptitle("sleepstudy: reaction time vs days of sleep deprivation (OLS line per subject)", fontsize=13)
-fig.supxlabel("Days")
-fig.supylabel("Reaction (ms)")
-plt.tight_layout()
-plt.show()
+display(data.head())
+data.info()
 """
-)
-
-md(
-    """### What to Watch For
-Individual differences are huge. Subject 308 starts fast (about 250 ms) and barely degrades; subject 337 starts slower and degrades dramatically (up to 600+ ms). Every subject has their own intercept *and* their own slope. Two naive strategies bracket the truth: one common line for everybody (complete pooling) pretends subjects do not exist; eighteen separate lines (no pooling) pretend the population does not exist. Mixed models — and their Bayesian generalization, hierarchical models — are the principled middle ground.
-
-Below, a look at the mean trajectory also shows the population-level effect we ultimately want to quantify:
-""",
-    """### На что обратить внимание
-Межиндивидуальные различия колоссальны. Участник 308 стартует быстро (около 250 мс) и почти не деградирует; участник 337 стартует медленнее и деградирует резко (до 600+ мс). У каждого своя и интерсепт, и скорость замедления. Две наивные стратегии ограничивают истину с двух сторон: одна общая прямая для всех (полное объединение) делает вид, что испытуемых не существует; восемнадцать отдельных прямых (без объединения) делают вид, что популяции не существует. Смешанные модели — и их байесовское обобщение, иерархические модели — являются принципиальной золотой серединой.
-
-Ниже средняя траектория показывает популяционный эффект, который мы в итоге хотим оценить количественно:
-""",
 )
 
 code(
-    """print("Mean reaction by day:")
-print(data.groupby("Days")[["Reaction"]].mean().round(1).to_string())
-
-fig, ax = plt.subplots(figsize=(9, 4))
-ax.scatter(data["Days"], data["Reaction"], color="C0", ec="black", alpha=0.35, s=20, label="all observations")
-mean_by_day = data.groupby("Days")["Reaction"].mean()
-ax.plot(mean_by_day.index, mean_by_day.values, "o-", color="C3", lw=2, label="mean by day")
-ax.set_xlabel("Days of sleep deprivation")
-ax.set_ylabel("Reaction (ms)")
-ax.legend()
-plt.tight_layout()
-plt.show()
+    """data['Subject'] = data.Subject.astype("category")
 """
 )
 
-# ---------------------------------------------------------------------------
-# Section 2: the classical naive ladder
-# ---------------------------------------------------------------------------
+code(
+    """data.groupby('Days')[['Reaction']].mean()
+"""
+)
+
+code(
+    """#посмотрим сколько людей и по сколько на каждого приходится значений
+plt.figure(figsize=(10,3))
+data.Subject.value_counts().plot(kind='bar');
+"""
+)
+
+code(
+    """plt.scatter(data.Days, data.Reaction, color="C0", ec="black", alpha=0.7);
+"""
+)
+
+code(
+    """plt.figure(figsize=(15,8))
+ax = sns.scatterplot(x = 'Days', y = 'Reaction', hue = 'Subject', data=data)
+sns.move_legend(ax, "upper left", bbox_to_anchor=(1, 1))
+"""
+)
+
+code(
+    """def plot_data(data):
+    fig, axes = plt.subplots(2, 9, figsize=(16, 7.5), sharey=True, sharex=True, dpi=100, constrained_layout=False)
+    fig.subplots_adjust(left=0.075, right=0.975, bottom=0.075, top=0.925, wspace=0.03)
+
+    axes_flat = axes.ravel()
+
+    for i, subject in enumerate(data["Subject"].unique()):
+        ax = axes_flat[i]
+        idx = data.index[data["Subject"] == subject].tolist()
+        days = data.loc[idx, "Days"].values
+        reaction = data.loc[idx, "Reaction"].values
+
+        # Plot observed data points
+        ax.scatter(days, reaction, color="C0", ec="black", alpha=0.7)
+
+        # Add a title
+        ax.set_title(f"Subject: {subject}", fontsize=14)
+
+    ax.xaxis.set_ticks([0, 2, 4, 6, 8])
+    fig.text(0.5, 0.02, "Days", fontsize=14)
+    fig.text(0.03, 0.5, "Reaction time (ms)", rotation=90, fontsize=14, va="center")
+
+    return axes
+"""
+)
+
+code(
+    """plot_data(data);
+"""
+)
+
 md(
-    """## 2. The Naive Ladder in Classical Territory
-
-### The Idea
-Before any mixed model, build the two baselines with the OLS tool you already know.
-- **Model 1 (complete pooling)**: one line for all 180 points — $\\text{Reaction} = \\beta_0 + \\beta_1 \\cdot \\text{Days} + \\varepsilon$. The slope answers the population question, but the residuals are correlated within subjects.
-- **Model 2 (subject dummies)**: add `C(Subject)` — a separate intercept for each subject. This is "no pooling" on intercepts: each person gets their own free parameter, the population does not constrain them at all.
-
-### Example — Model 1
+    """Наша основная цель — измерить связь между днями депривации сна и временем реакции. Нас интересует как общее воздействие на всех испытуемых, так и воздействие, связанное с каждым отдельным испытуемым. Для таких задач есть специальные модели: иерархические регрессионные модели. В рамках этих моделей можно учесть и общие эффекты, и специфические для каждого испытуемого. Такие эффекты в статистической литературе также известны как фиксированные и случайные эффекты. Но пока попробуем построить обычную линейную модель с помощью уже знакомых инструментов.
 """,
-    """## 2. Наивная лестница в классической территории
+    """Our main goal is to measure the relationship between days of sleep deprivation and reaction time. We care both about the overall effect shared by all subjects and about the effect specific to each individual subject. For such tasks there are special models: hierarchical regression models. Within these models one can account for both the common effects and the subject-specific ones. In the statistical literature such effects are also known as fixed and random effects. But first let us fit an ordinary linear model with tools you already know.
+""",
+)
 
-### Идея
-До всяких смешанных моделей построим два базовых уровня уже знакомым OLS-инструментом.
-- **Модель 1 (полное объединение)**: одна прямая на все 180 точек — $\\text{Reaction} = \\beta_0 + \\beta_1 \\cdot \\text{Days} + \\varepsilon$. Наклон отвечает на популяционный вопрос, но остатки коррелированы внутри испытуемых.
-- **Модель 2 (дамми испытуемых)**: добавим `C(Subject)` — отдельный интерсепт каждому испытуемому. Это «без объединения» по интерсептам: каждый человек получает собственный свободный параметр, популяция его никак не ограничивает.
+md(
+    """### Обычная линейная модель
+- Модель 1 — сначала оценим простую модель времени реакции от дня недосыпа;
+- Модель 2 — затем оценим более сложную модель, где добавим субъекта в модель.
 
-### Пример — модель 1
+#### Модель 1
+""",
+    """### Ordinary linear model
+- Model 1 — first we fit a simple model of reaction time on days of deprivation;
+- Model 2 — then a more complex model that adds the subject to the model.
+
+#### Model 1
 """,
 )
 
@@ -217,558 +243,571 @@ code(
     """lm_basic = smf.ols(formula="Reaction ~ Days", data=data).fit()
 print(lm_basic.summary())
 
-print("\\nDurbin-Watson on the residual order:", round(durbin_watson(lm_basic.resid), 3))
-print("Shapiro-Wilk on residuals: W =", round(stats.shapiro(lm_basic.resid).statistic, 3),
-      "p =", stats.shapiro(lm_basic.resid).pvalue)
+print("\\nDurbin-Watson:", round(durbin_watson(lm_basic.resid), 3))
 """
 )
 
 md(
-    """### What to Watch For
-The summary reports Durbin–Watson $\\approx 0.7$. Two clarifications students often get wrong:
-1. **Durbin–Watson measures autocorrelation of residuals in row order, not multicollinearity of predictors.** DW $\\approx 2$ means no lag-1 autocorrelation; our $0.7$ means strong *positive* autocorrelation — consecutive rows belong to the same subject, so their errors are similar.
-2. Shapiro–Wilk rejects exact normality, but that is a marginal-distribution symptom; the *structural* problem (clustered errors) is what invalidates standard errors, and no transformation of residuals fixes it.
-
-The prediction plot makes the failure visible — the 95% bands for the mean and for new observations look reassuring, but they are computed under the false independence assumption (effectively $n = 180$ independent points, when we really have $n = 18$ subjects):
+    """Если смотреть на табличку, то единственный тревожный звонок — это Durbin-Watson. Важное уточнение: статистика Дарбина–Уотсона проверяет **автокорреляцию остатков** (по порядку строк), а не коллинеарность предикторов. Значение около 2 означает отсутствие автокорреляции; у нас ≈ 0.7, то есть сильная положительная автокорреляция: соседние строки относятся к одному и тому же испытуемому, и их ошибки похожи. Правило большого пальца: значения примерно от 1 до 3 обычно не вызывают тревоги, заметные отклонения от 2 — повод разбираться. Давайте посмотрим на остатки. Если сделать тест Шапиро — гипотеза о нормальности будет отвергнута, но основная проблема здесь в структуре остатков, а не в форме распределения.
 """,
-    """### На что обратить внимание
-Summary выдаёт Дарбина–Уотсона $\\approx 0{,}7$. Два уточнения, которые часто путают:
-1. **Дарбин–Уотсон измеряет автокорреляцию остатков в порядке строк, а не мультиколлинеарность предикторов.** DW $\\approx 2$ — нет автокорреляции лага 1; наше $0{,}7$ — сильная *положительная* автокорреляция: соседние строки принадлежат одному испытуемому, поэтому их ошибки похожи.
-2. Шапиро–Уилк отвергает точную нормальность, но это симптом маргинального распределения; *структурная* проблема (кластеризованные ошибки) — именно то, что обесценивает стандартные ошибки, и никакое преобразование остатков её не исправляет.
-
-График предсказаний делает провал видимым — 95%-е коридоры для среднего и для новых наблюдений выглядят успокаивающе, но они вычислены при ложном предположении независимости (фактически $n = 180$ независимых точек, хотя на самом деле у нас $n = 18$ испытуемых):
+    """Looking at the table, the only alarm bell is Durbin-Watson. An important clarification: the Durbin-Watson statistic tests the **autocorrelation of residuals** in row order, not collinearity of predictors. A value near 2 means no autocorrelation; ours is ≈ 0.7 — strong positive autocorrelation: consecutive rows belong to the same subject, so their errors are similar. A rough rule of thumb: values between about 1 and 3 are usually unremarkable, clear departures from 2 call for investigation. Let us look at the residuals. A Shapiro test would reject normality, but the main problem here is the structure of the residuals, not the shape of their distribution.
 """,
 )
 
 code(
-    """def residual_diagnostics(residuals, title):
-    \"\"\"Histogram, QQ-plot and residuals-in-row-order panel.\"\"\"
-    fig, axs = plt.subplots(1, 3, figsize=(11, 3))
-    axs[0].hist(residuals, bins=25, color="C0", alpha=0.7, edgecolor="white")
-    axs[0].set_title("residual histogram")
-    qqplot(residuals, line="s", ax=axs[1], markersize=3)
-    axs[1].set_title("QQ-plot vs Normal")
-    axs[2].scatter(range(len(residuals)), residuals, s=8, alpha=0.6, color="C0")
-    axs[2].set_title("residuals in row order")
-    axs[2].set_xlabel("row (subject-major order)")
-    fig.suptitle(title)
-    plt.tight_layout()
-    plt.show()
-    print("Shapiro-Wilk:", stats.shapiro(residuals))
+    """fig, axs = plt.subplots(1, 3, figsize = (10, 3))
+axs[0].hist(lm_basic.resid)
+qqplot(lm_basic.resid, line="s", ax=axs[1], markersize=3)
+axs[2].scatter(range(len(lm_basic.resid)), lm_basic.resid, s=8)
+plt.show()
+pg.normality(lm_basic.resid)
+"""
+)
 
-residual_diagnostics(np.asarray(lm_basic.resid), "Model 1 (pooled OLS): residuals")
+code(
+    """pred_ols = lm_basic.get_prediction()
+iv_l = pred_ols.summary_frame()["obs_ci_lower"]
+iv_u = pred_ols.summary_frame()["obs_ci_upper"]
 
-# Predictions with mean-CI and observation-CI bands
-pred = lm_basic.get_prediction().summary_frame()
-fig, ax = plt.subplots(figsize=(9, 4.5))
-ax.scatter(data["Days"], data["Reaction"], color="C0", ec="black", alpha=0.5, s=20, label="data")
-order = np.argsort(data["Days"].values)
-ax.plot(data["Days"].values[order], pred["mean"].values[order], "r-", label="OLS fit")
-ax.plot(data["Days"].values[order], pred["mean_ci_lower"].values[order], "r--", lw=1, label="95% CI for the mean")
-ax.plot(data["Days"].values[order], pred["mean_ci_upper"].values[order], "r--", lw=1)
-ax.plot(data["Days"].values[order], pred["obs_ci_lower"].values[order], "g--", lw=1, label="95% interval for a new obs")
-ax.plot(data["Days"].values[order], pred["obs_ci_upper"].values[order], "g--", lw=1)
-ax.set_xlabel("Days"); ax.set_ylabel("Reaction (ms)"); ax.legend()
-plt.tight_layout(); plt.show()
+mean_iv_l = pred_ols.summary_frame()["mean_ci_lower"]
+mean_iv_u = pred_ols.summary_frame()["mean_ci_upper"]
+
+order = np.argsort(data.Days.values)
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.scatter(data.Days, data.Reaction, color="C0", ec="black", alpha=0.7, label="data")
+ax.plot(data.Days.values[order], lm_basic.fittedvalues.values[order], "r--.", label="OLS")
+ax.plot(data.Days.values[order], mean_iv_l.values[order], "r--", label='Mean 95% CI: lower')
+ax.plot(data.Days.values[order], mean_iv_u.values[order], "r--", label='Mean 95% CI: upper')
+ax.plot(data.Days.values[order], iv_l.values[order], "b--", label='Obs 95%: lower')
+ax.plot(data.Days.values[order], iv_u.values[order], "g--", label='Obs 95%: upper')
+ax.legend(loc="best");
 """
 )
 
 md(
-    """### Example — Model 2 (subject dummies)
+    """#### Модель 2
 
-Now each subject receives their own intercept. Universality is lost — predictions require knowing *which* subject — but within-subject correlation of intercepts disappears, because it is absorbed by the 18 dummy coefficients:
+В этой модели добавим для каждого субъекта свою «поправку» для свободного члена в уравнении регрессии (дамми-переменные для субъектов). Универсальность модели теряется: предсказание можно сделать только с учётом конкретного субъекта. Но модель становится лучше, и проблема коррелированности остатков практически решается.
 """,
-    """### Пример — модель 2 (дамми испытуемых)
+    """#### Model 2
 
-Теперь каждый испытуемый получает собственный интерсепт. Универсальность потеряна — для предсказания нужно знать, *какой именно* испытуемый, — но внутрииспытуемая корреляция интерсептов исчезает: она поглощена 18 дамми-коэффициентами:
+In this model we give every subject their own "correction" to the intercept of the regression equation (dummy variables for subjects). The model loses universality: predictions are only possible for a specific, known subject. But the model improves, and the problem of correlated residuals is essentially resolved.
 """,
 )
 
 code(
     """lm_sub = smf.ols(formula="Reaction ~ Days + C(Subject)", data=data).fit()
-print(lm_sub.summary().tables[0])
-print(lm_sub.summary().tables[1].as_text()[:1200], " ...")
+print(lm_sub.summary())
+"""
+)
 
-residual_diagnostics(np.asarray(lm_sub.resid), "Model 2 (subject dummies): residuals")
+code(
+    """fig, axs = plt.subplots(1, 3, figsize = (10, 3))
+axs[0].hist(lm_sub.resid)
+qqplot(lm_sub.resid, line="s", ax=axs[1], markersize=3)
+axs[2].scatter(range(len(lm_sub.resid)), lm_sub.resid, s=8)
+plt.show()
+pg.normality(lm_sub.resid)
+"""
+)
 
-# Per-subject fits of the dummy model
-data["fitted_sub"] = lm_sub.fittedvalues
-fig, ax = plt.subplots(figsize=(11, 5))
-ax.scatter(data["Days"], data["Reaction"], color="C0", ec="black", alpha=0.4, s=18)
-sns.lineplot(x="Days", y="fitted_sub", hue="Subject", data=data, ax=ax, palette="tab20", lw=1.2, legend=False)
-ax.set_title("Model 2: parallel per-subject lines (common slope, free intercepts)")
-plt.tight_layout(); plt.show()
+code(
+    """data.groupby('Subject')[['Reaction']].mean()
+"""
+)
+
+code(
+    """plt.scatter(data.Days, lm_sub.fittedvalues)
+"""
+)
+
+code(
+    """#посмотрим на прогноз модели по каждому испытуемому
+pred_ols = lm_sub.get_prediction()
+data['fitted_sub'] = lm_sub.fittedvalues
+
+fig, ax = plt.subplots(figsize=(15, 8))
+ax.scatter(data.Days, data.Reaction, color="C0", ec="black", alpha=0.7)
+sns.lineplot(x = 'Days', y = 'fitted_sub', hue = 'Subject', data=data)
+sns.move_legend(ax, "upper left", bbox_to_anchor=(1, 1))
 """
 )
 
 md(
-    """### What to Watch For
-Residual structure improves markedly (DW, QQ-plot, the row-order scatter). But Model 2 has three deep problems:
-1. **18 extra parameters with no shrinkage** — noisy subjects get extreme intercepts exactly as extreme as their noise demands.
-2. **The slope is still forced to be common** — yet the panel showed individually different slopes; subject 309 degrades almost three times faster than subject 335.
-3. **No prediction for a new person is possible** — a dummy for a subject we have never seen does not exist.
+    """### Смешанные модели
 
-These three problems are exactly what the random-effects machinery answers: give each subject parameters that are *draws from a population distribution* instead of free unrelated numbers.
+Смешанная модель — это статистическая модель, которая включает как фиксированные, так и случайные эффекты.
+
+Фиксированные эффекты описывают коэффициенты, общие для всей совокупности наблюдений: например, усреднённое воздействие фактора (дозировка лекарства) или уровень группы (пол, условие эксперимента). Случайные эффекты описывают отклонения, которые меняются от группы к группе (например, индивидуальный сдвиг времени реакции каждого испытуемого) и предполагаются извлечёнными из некоторого распределения. В смешанной модели фиксированные и случайные эффекты оцениваются совместно. Разделение на фиксированные и случайные эффекты достаточно условно и зависит от конкретного эксперимента: один и тот же фактор может входить в модель по-разному в зависимости от вопроса исследования.
+
+#### Модель со случайным смещением
+
+Идея: каждый испытуемый обладает своим собственным уровнем времени реакции, при этом то, насколько может варьироваться это смещение, ограничивается дисперсией случайного эффекта. Модель формулируется так:
+
+$$Reaction_{ij} = \\beta_0 + \\beta_1 Days_{ij} + b_i + \\varepsilon_{ij},$$
+
+где $i$ — номер субъекта, $j$ — индекс дня, и
+
+$$b_i \\sim N(0, \\sigma_b^2), \\qquad \\varepsilon_{ij} \\sim N(0, \\sigma^2).$$
+
+В R модель записывается так:
+```R
+mod1 <- lmer(Reaction ~ Days + (1 | Subject), data = data)
+```
 """,
-    """### На что обратить внимание
-Структура остатков заметно улучшается (DW, QQ-график, рассеяние по порядку строк). Но у модели 2 три глубокие проблемы:
-1. **18 дополнительных параметров без сжатия** — зашумлённые испытуемые получают экстремальные интерсепты ровно настолько экстремальные, насколько требует их шум.
-2. **Наклон по-прежнему общий** — хотя панель показала индивидуально разные наклоны; участник 309 деградирует почти втрое быстрее участника 335.
-3. **Предсказание для нового человека невозможно** — дамми для никогда прежде не наблюдавшегося испытуемого не существует.
+    """### Mixed models
 
-Ровно на эти три проблемы отвечает аппарат случайных эффектов: дать каждому испытуемому параметры, *извлечённые из популяционного распределения*, а не свободные несвязанные числа.
-""",
-)
+A mixed model is a statistical model that includes both fixed and random effects.
 
-# ---------------------------------------------------------------------------
-# Section 3: mixed models
-# ---------------------------------------------------------------------------
-md(
-    """## 3. Linear Mixed Models: Random Intercepts, then Random Slopes
+Fixed effects describe coefficients shared by the whole set of observations: for example, an averaged effect of a factor (drug dosage) or the level of a group (sex, experimental condition). Random effects describe deviations that vary from group to group (for example, the individual shift of each subject's reaction time) and are assumed to be drawn from some distribution. In a mixed model, fixed and random effects are estimated jointly. The division into fixed and random effects is fairly conventional and depends on the specific experiment: the same factor can enter the model differently depending on the research question.
 
-### The Idea
-A **mixed model** contains *fixed effects* — population-level coefficients shared by everyone (here: the average intercept $\\beta_0$ and the average slope $\\beta_1$) — and *random effects* — subject-level deviations modelled as draws from a distribution. The random-intercept model:
+#### Random-intercept model
 
-$$\\text{Reaction}_{ij} = \\beta_0 + \\beta_1 \\, \\text{Days}_{ij} + b_i + \\varepsilon_{ij}, \\qquad b_i \\sim \\mathcal{N}(0, \\sigma_b^2), \\;\\; \\varepsilon_{ij} \\sim \\mathcal{N}(0, \\sigma^2)$$
+The idea: every subject has their own baseline level of reaction time, while how much these shifts may vary is limited by the variance of the random effect. The model is formulated as
 
-where $i$ indexes subjects and $j$ days. In R (`lme4`) this is `lmer(Reaction ~ Days + (1 | Subject))`; in Python `statsmodels` uses `mixedlm`. The variance components $\\sigma_b^2$ and $\\sigma^2$ are estimated together with the fixed effects (by default via REML — restricted maximum likelihood).
+$$Reaction_{ij} = \\beta_0 + \\beta_1 Days_{ij} + b_i + \\varepsilon_{ij},$$
 
-### Example — random intercept
-""",
-    """## 3. Линейные смешанные модели: случайные интерсепты, затем случайные наклоны
+where $i$ indexes subjects, $j$ indexes days, and
 
-### Идея
-**Смешанная модель** содержит *фиксированные эффекты* — коэффициенты популяционного уровня, общие для всех (здесь: средний интерсепт $\\beta_0$ и средний наклон $\\beta_1$) — и *случайные эффекты* — отклонения уровня испытуемых, моделируемые как извлечения из распределения. Модель со случайным интерсептом:
+$$b_i \\sim N(0, \\sigma_b^2), \\qquad \\varepsilon_{ij} \\sim N(0, \\sigma^2).$$
 
-$$\\text{Reaction}_{ij} = \\beta_0 + \\beta_1 \\, \\text{Days}_{ij} + b_i + \\varepsilon_{ij}, \\qquad b_i \\sim \\mathcal{N}(0, \\sigma_b^2), \\;\\; \\varepsilon_{ij} \\sim \\mathcal{N}(0, \\sigma^2)$$
-
-где $i$ — номер испытуемого, $j$ — день. В R (`lme4`) это `lmer(Reaction ~ Days + (1 | Subject))`; в Python `statsmodels` использует `mixedlm`. Компоненты дисперсии $\\sigma_b^2$ и $\\sigma^2$ оцениваются вместе с фиксированными эффектами (по умолчанию методом REML — ограниченного максимального правдоподобия).
-
-### Пример — случайный интерсепт
+In R the model is written as
+```R
+mod1 <- lmer(Reaction ~ Days + (1 | Subject), data = data)
+```
 """,
 )
 
 code(
-    """lm_mixed_ri = smf.mixedlm("Reaction ~ Days", data, groups=data["Subject"]).fit(reml=True)
-print(lm_mixed_ri.summary())
-
-# Variance components from the fitted object (never hardcode summary numbers!)
-var_subject = lm_mixed_ri.cov_re.iloc[0, 0]
-var_residual = lm_mixed_ri.scale
-print(f"sigma_b (between-subject SD of intercepts) = sqrt({var_subject:.1f}) = {np.sqrt(var_subject):.2f} ms")
-print(f"sigma   (within-subject residual SD)        = sqrt({var_residual:.1f}) = {np.sqrt(var_residual):.2f} ms")
-print("Intraclass correlation ICC = sigma_b^2 / (sigma_b^2 + sigma^2) =",
-      round(var_subject / (var_subject + var_residual), 3))
+    """lm_mixed = smf.mixedlm("Reaction ~ Days", data, groups=data["Subject"]).fit()
+print(lm_mixed.summary())
 """
 )
 
-md(
-    """### What to Watch For
-- $\\hat\\sigma_b \\approx 37$ ms — the population SD of personal baselines; ICC $\\approx 0.68$ means about two thirds of the residual variance lives *between* subjects, which is exactly the correlation the pooled OLS pretended not to exist.
-- The subject deviations printed below are **BLUPs** (conditional modes): point predictions of $b_i$ given the estimated variance components. They come *without* usable standard errors, and they inherit the uncertainty of $\\hat\\sigma_b$ silently — keep this limitation in mind for the Bayesian comparison later.
-""",
-    """### На что обратить внимание
-- $\\hat\\sigma_b \\approx 37$ мс — популяционное SD личных базовых уровней; ICC $\\approx 0{,}68$ означает, что около двух третей остаточной дисперсии живёт *между* испытуемыми — ровно та корреляция, которую объединённый OLS делал вид, что не замечает.
-- Отклонения испытуемых, напечатанные ниже, — **BLUP** (условные моды): точечные предсказания $b_i$ при оценённых компонентах дисперсии. Они идут *без* пригодных стандартных ошибок и молча наследуют неопределённость $\\hat\\sigma_b$ — держите это ограничение в уме для байесовского сравнения позже.
-""",
+code(
+    """lm_mixed.conf_int()
+"""
 )
 
 code(
-    """re_ri = pd.DataFrame(lm_mixed_ri.random_effects).T
-re_ri.columns = ["b_i (BLUP)"]
-print(re_ri.T.round(1).to_string())
+    """# Стандартное отклонение случайного эффекта берём из подогнанной модели, а не из summary вручную
+var_subject = lm_mixed.cov_re.iloc[0, 0]
+print(f"Стандартное отклонение для распределения коэффициентов по субъектам: sqrt({var_subject:.1f}) = {np.sqrt(var_subject):.2f} мс")
+print(f"Остаточное стандартное отклонение: sqrt({lm_mixed.scale:.1f}) = {np.sqrt(lm_mixed.scale):.2f} мс")
+print(f"Внутриклассовая корреляция ICC = {var_subject / (var_subject + lm_mixed.scale):.2f}")
+"""
+)
 
-fig, ax = plt.subplots(figsize=(11, 3.5))
-re_ri["b_i (BLUP)"].plot(kind="bar", ax=ax, color="C0", edgecolor="black")
-ax.axhline(0, color="C3", lw=1)
-ax.set_ylabel("BLUP $\\\\hat b_i$ (ms)")
-ax.set_title("Random-intercept model: predicted subject deviations")
-plt.tight_layout(); plt.show()
+code(
+    """print("Можно посмотреть, как по субъектам сдвигается время реакции")
+pd.DataFrame(lm_mixed.random_effects).T.plot(kind='bar');
+"""
+)
 
-# Fitted per-subject lines
-data["fitted_ri"] = lm_mixed_ri.fittedvalues
-fig, ax = plt.subplots(figsize=(11, 5))
-ax.scatter(data["Days"], data["Reaction"], color="C0", ec="black", alpha=0.4, s=18)
-sns.lineplot(x="Days", y="fitted_ri", hue="Subject", data=data, ax=ax, palette="tab20", lw=1.2, legend=False)
-ax.set_title("Random-intercept model: common slope, subject offsets")
-plt.tight_layout(); plt.show()
+code(
+    """#посмотрим на прогноз модели по каждому испытуемому
+data['fitted_sub'] = lm_mixed.fittedvalues
 
-residual_diagnostics(np.asarray(lm_mixed_ri.resid), "Random-intercept MixedLM: residuals")
+fig, ax = plt.subplots(figsize=(15, 8))
+ax.scatter(data.Days, data.Reaction, color="C0", ec="black", alpha=0.7)
+sns.lineplot(x = 'Days', y = 'fitted_sub', hue = 'Subject', data=data)
+sns.move_legend(ax, "upper left", bbox_to_anchor=(1, 1))
+"""
+)
 
-# Residual structure by day and by subject
-data["resid_ri"] = lm_mixed_ri.resid
-fig, axs = plt.subplots(1, 2, figsize=(12, 3.5))
-sns.boxplot(x="Days", y="resid_ri", data=data, ax=axs[0], color="C0")
-axs[0].set_title("residuals by day")
-sns.boxplot(x="Subject", y="resid_ri", data=data, ax=axs[1], color="C0")
+code(
+    """fig, axs = plt.subplots(1, 3, figsize = (10, 3))
+axs[0].hist(lm_mixed.resid)
+qqplot(lm_mixed.resid, line="s", ax=axs[1], markersize=3)
+axs[2].scatter(range(len(lm_mixed.resid)), lm_mixed.resid, s=8)
+plt.show()
+pg.normality(lm_mixed.resid)
+"""
+)
+
+code(
+    """print("Посмотрим, как устроены остатки модели по дням и субъектам: по дням остаётся систематический тренд")
+data['resids'] = lm_mixed.resid
+fig, axs = plt.subplots(1, 2, figsize = (10, 3))
+sns.boxplot(x = 'Days', y = 'resids', data=data, ax=axs[0])
+sns.boxplot(x = 'Subject', y = 'resids', data=data, ax=axs[1])
 axs[1].tick_params(axis="x", labelrotation=90)
-axs[1].set_title("residuals by subject")
-plt.tight_layout(); plt.show()
+plt.show()
 """
 )
 
 md(
-    """### Example — random intercept **and** random slope
+    """#### Доверительный коридор для популяционной прямой
 
-The subject-level panels still show systematic patterns: some subjects' residuals trend upward within the boxplots — their true slopes differ. Add a random slope:
+Полезно построить доверительный коридор для среднего отклика $\\mu(x) = \\beta_0 + \\beta_1 x$. Важная тонкость: нельзя подставлять одновременно оба нижних (или оба верхних) конца доверительных интервалов для $\\beta_0$ и $\\beta_1$ — так получается «прямоугольник» в пространстве параметров, который игнорирует ковариацию оценок и завышает неопределённость. Корректный поточечный коридор использует ковариационную матрицу фиксированных эффектов:
 
-$$\\text{Reaction}_{ij} = \\beta_0 + \\beta_1 \\, \\text{Days}_{ij} + b_i + c_i \\, \\text{Days}_{ij} + \\varepsilon_{ij}$$
+$$\\widehat{\\mathrm{se}}\\big(\\hat\\mu(x)\\big) = \\sqrt{\\mathbf{x}^{\\top} \\, \\widehat{\\operatorname{Cov}}(\\hat\\beta)\\, \\mathbf{x}}, \\qquad \\hat\\mu(x) \\pm z_{0.975}\\,\\widehat{\\mathrm{se}}.$$
 
-$$(b_i, c_i) \\sim \\mathcal{N}\\!\\left(\\mathbf{0}, \\begin{bmatrix} \\sigma_b^2 & \\rho\\,\\sigma_b\\sigma_c \\\\ \\rho\\,\\sigma_b\\sigma_c & \\sigma_c^2 \\end{bmatrix}\\right)$$
-
-In `lme4`: `lmer(Reaction ~ Days + (1 + Days | Subject))`. **Important:** `statsmodels` with `re_formula="~ Days"` estimates the full $2\\times 2$ covariance, including the correlation $\\rho$ between random intercepts and slopes (it appears in the summary as `Group x Days Cov`). A common misconception says statsmodels cannot model this covariance structure — it can and does; what it cannot give you is a standard error or a test for $\\rho$.
+Ниже серым пунктиром для сравнения показан и некорректный «угловой» коридор.
 """,
-    """### Пример — случайный интерсепт **и** случайный наклон
+    """#### A confidence band for the population line
 
-В панелях по испытуемым всё ещё видны систематические узоры: у некоторых остатки внутри боксплотов идут с трендом — их истинные наклоны различаются. Добавим случайный наклон:
+It is useful to construct a confidence band for the mean response $\\mu(x) = \\beta_0 + \\beta_1 x$. An important subtlety: one must not plug in both lower (or both upper) confidence limits of $\\beta_0$ and $\\beta_1$ at once — that traces the corners of a parameter rectangle, ignores the covariance of the estimates and overstates uncertainty. The correct pointwise band uses the covariance matrix of the fixed effects:
 
-$$\\text{Reaction}_{ij} = \\beta_0 + \\beta_1 \\, \\text{Days}_{ij} + b_i + c_i \\, \\text{Days}_{ij} + \\varepsilon_{ij}$$
+$$\\widehat{\\mathrm{se}}\\big(\\hat\\mu(x)\\big) = \\sqrt{\\mathbf{x}^{\\top} \\, \\widehat{\\operatorname{Cov}}(\\hat\\beta)\\, \\mathbf{x}}, \\qquad \\hat\\mu(x) \\pm z_{0.975}\\,\\widehat{\\mathrm{se}}.$$
 
-$$(b_i, c_i) \\sim \\mathcal{N}\\!\\left(\\mathbf{0}, \\begin{bmatrix} \\sigma_b^2 & \\rho\\,\\sigma_b\\sigma_c \\\\ \\rho\\,\\sigma_b\\sigma_c & \\sigma_c^2 \\end{bmatrix}\\right)$$
-
-В `lme4`: `lmer(Reaction ~ Days + (1 + Days | Subject))`. **Важно:** `statsmodels` с `re_formula="~ Days"` оценивает полную ковариацию $2\\times 2$, включая корреляцию $\\rho$ между случайными интерсептами и наклонами (в summary она видна как `Group x Days Cov`). Распространённое заблуждение утверждает, что statsmodels не умеет моделировать эту ковариационную структуру — умеет; чего он не даёт, так это стандартной ошибки или теста для $\\rho$.
-""",
-)
-
-code(
-    """lm_mixed_ris = smf.mixedlm("Reaction ~ Days", data, groups=data["Subject"], re_formula="~ Days").fit(reml=True)
-print(lm_mixed_ris.summary())
-
-cov_re = lm_mixed_ris.cov_re
-print("\\nEstimated random-effects covariance matrix (BLUP scale):")
-print(cov_re.round(2))
-
-corr_model = cov_re.iloc[0, 1] / np.sqrt(cov_re.iloc[0, 0] * cov_re.iloc[1, 1])
-print(f"\\nModel-estimated corr(intercept, slope) rho = {corr_model:.3f}")
-print("statsmodels reports no standard error for rho — remember this for the Bayesian part.")
-
-re_ris = pd.DataFrame(lm_mixed_ris.random_effects).T
-re_ris.columns = ["b_i (intercept)", "c_i (slope)"]
-print("\\nFirst BLUPs:"); print(re_ris.head().round(1).to_string())
-
-fig, ax = plt.subplots(figsize=(5.5, 4.5))
-ax.scatter(re_ris["b_i (intercept)"], re_ris["c_i (slope)"], color="C0", ec="black", alpha=0.8)
-for subj, row in re_ris.iterrows():
-    ax.annotate(str(subj), (row["b_i (intercept)"], row["c_i (slope)"]), fontsize=7, alpha=0.7)
-ax.set_xlabel("BLUP intercept deviation $\\\\hat b_i$ (ms)")
-ax.set_ylabel("BLUP slope deviation $\\\\hat c_i$ (ms/day)")
-ax.set_title(f"BLUPs vs model estimate: sample corr = {np.corrcoef(re_ris.iloc[:,0], re_ris.iloc[:,1])[0,1]:.2f}, model rho = {corr_model:.2f}")
-plt.tight_layout(); plt.show()
-
-residual_diagnostics(np.asarray(lm_mixed_ris.resid), "Random-intercept+slope MixedLM: residuals")
-
-data["resid_ris"] = lm_mixed_ris.resid
-fig, axs = plt.subplots(1, 2, figsize=(12, 3.5))
-sns.boxplot(x="Days", y="resid_ris", data=data, ax=axs[0], color="C0")
-axs[0].set_title("residuals by day (improved)")
-sns.boxplot(x="Subject", y="resid_ris", data=data, ax=axs[1], color="C0")
-axs[1].tick_params(axis="x", labelrotation=90)
-axs[1].set_title("residuals by subject (improved)")
-plt.tight_layout(); plt.show()
-"""
-)
-
-md(
-    """### What to Watch For
-- Residual boxplots by day and by subject are now much flatter; the RIS model has absorbed both personal baselines and personal vulnerability to sleep loss.
-- The model-estimated correlation $\\hat\\rho \\approx 0.07$ is **not** the correlation of the BLUP scatter (that sample correlation is inflated: BLUPs are shrunk predictions, not parameter estimates, and their sample correlation conflates shrinkage with the true $\\rho$). Report $\\hat\\rho$ from `cov_re`, and remember it arrives without uncertainty quantification.
-- The variance-component inference problem in one sentence: `lme4` famously refuses to print p-values for fixed effects in small samples, and neither `lme4` nor `statsmodels` gives you a confidence interval for $\\sigma_b$, $\\sigma_c$ or $\\rho$. The parametric bootstrap is the classical escape; the Bayesian posterior is the more direct one — both are coming next (bootstrap on the homework path, posterior right below).
-""",
-    """### На что обратить внимание
-- Боксплоты остатков по дням и по испытуемым теперь заметно ровнее; модель со случайным наклоном поглотила и личные базовые уровни, и личную уязвимость к недосыпу.
-- Оценённая моделью корреляция $\\hat\\rho \\approx 0{,}07$ — **не** корреляция облака BLUP (выборочная корреляция завышена: BLUP — сжатые предсказания, а не оценки параметров, и их выборочная корреляция смешивает сжатие с истинным $\\rho$). Сообщайте $\\hat\\rho$ из `cov_re` и помните, что она приходит без квантификации неопределённости.
-- Проблема вывода для компонент дисперсии в одном предложении: `lme4` известен тем, что отказывается печатать p-значения для фиксированных эффектов в малых выборках, и ни `lme4`, ни `statsmodels` не дают доверительный интервал для $\\sigma_b$, $\\sigma_c$ или $\\rho$. Классический выход — параметрический бутстреп; более прямой — байесовское апостериорное распределение (бутстреп остаётся на домашнем пути, апостериорное — сразу ниже).
-""",
-)
-
-# ---------------------------------------------------------------------------
-# Section 4: correct CI band
-# ---------------------------------------------------------------------------
-md(
-    """## 4. A Correct Confidence Band for the Population Line
-
-### The Idea
-A tempting shortcut (seen in many course notebooks, including the legacy version of this one) plots the "lower band" by combining the lower CI of the intercept with the lower CI of the slope, and the "upper band" from the two uppers. That is **not** a confidence band: it joins opposite corners of the parameter rectangle, ignores the covariance between $\\hat\\beta_0$ and $\\hat\\beta_1$, and overstates uncertainty at every $x$. The correct pointwise band uses the full covariance matrix of the fixed effects:
-
-$$\\widehat{\\mathrm{se}}\\big(\\hat\\mu(x)\\big) = \\sqrt{\\mathbf{x}^{\\top} \\, \\widehat{\\operatorname{Cov}}(\\hat\\beta)\\, \\mathbf{x}}, \\qquad \\hat\\mu(x) \\pm t_{0.975,\\, \\mathrm{df}} \\cdot \\widehat{\\mathrm{se}}$$
-
-### Example
-""",
-    """## 4. Корректный доверительный коридор для популяционной прямой
-
-### Идея
-Заманчивый ярлык (встречающийся во многих учебных тетрадях, включая прежнюю версию этой) строит «нижнюю границу» из нижних доверительных границ интерсепта и наклона, а «верхнюю» — из двух верхних. Это **не** доверительный коридор: он соединяет противоположные углы прямоугольника параметров, игнорирует ковариацию между $\\hat\\beta_0$ и $\\hat\\beta_1$ и завышает неопределённость при каждом $x$. Корректный поточечный коридор использует полную ковариационную матрицу фиксированных эффектов:
-
-$$\\widehat{\\mathrm{se}}\\big(\\hat\\mu(x)\\big) = \\sqrt{\\mathbf{x}^{\\top} \\, \\widehat{\\operatorname{Cov}}(\\hat\\beta)\\, \\mathbf{x}}, \\qquad \\hat\\mu(x) \\pm t_{0.975,\\, \\mathrm{df}} \\cdot \\widehat{\\mathrm{se}}$$
-
-### Пример
+Below, the incorrect "corner" band is shown in gray dotted lines for comparison.
 """,
 )
 
 code(
     """def fixed_effect_ci_band(res, xs):
-    \"\"\"Pointwise t-CI for the fixed-effects mean of a MixedLM at points xs.\"\"\"
-    X = np.column_stack([np.ones_like(xs), xs])          # design for [Intercept, Days]
+    # Поточечный доверительный коридор для фиксированных эффектов MixedLM
+    X = np.column_stack([np.ones_like(xs), xs])
     beta = res.fe_params.values[:2]
     V = res.cov_params().loc[["Intercept", "Days"], ["Intercept", "Days"]].values
     mean = X @ beta
     se = np.sqrt(np.einsum("ij,jk,ik->i", X, V, X))
-    # statsmodels keeps a residual-df-style normal approximation for REML fits;
-    # we use the normal quantile, which is what MixedLM itself reports.
     crit = stats.norm.ppf(0.975)
     return mean, mean - crit * se, mean + crit * se
 
 xs = np.linspace(0, 9, 100)
-mean, lo, hi = fixed_effect_ci_band(lm_mixed_ris, xs)
+mean, lo, hi = fixed_effect_ci_band(lm_mixed, xs)
 
-# The incorrect "rectangle corner" band for comparison
-ci = lm_mixed_ris.conf_int().loc[["Intercept", "Days"]]
-corner_lo = ci.loc["Intercept", 0] + ci.loc["Days", 0] * xs
-corner_hi = ci.loc["Intercept", 1] + ci.loc["Days", 1] * xs
+# Некорректный «угловой» коридор для сравнения
+conf_ints = lm_mixed.conf_int()
+corner_lo = conf_ints.loc['Intercept', 0] + conf_ints.loc['Days', 0] * xs
+corner_hi = conf_ints.loc['Intercept', 1] + conf_ints.loc['Days', 1] * xs
 
-fig, ax = plt.subplots(figsize=(9, 4.5))
-ax.scatter(data["Days"], data["Reaction"], color="C0", ec="black", alpha=0.35, s=18, label="data")
-ax.plot(xs, mean, "r-", label="fixed-effects mean")
-ax.fill_between(xs, lo, hi, color="C3", alpha=0.35, label="correct pointwise 95% CI")
-ax.plot(xs, corner_lo, ":", color="gray", lw=2, label="corner-plugging band (WRONG)")
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.scatter(data.Days, data.Reaction, color="C0", ec="black", alpha=0.35, s=18, label="data")
+ax.plot(xs, mean, "r-", label="FixedMean")
+ax.fill_between(xs, lo, hi, color="C3", alpha=0.3, label="корректный 95% коридор")
+ax.plot(xs, corner_lo, ":", color="gray", lw=2, label="«угловой» коридор (некорректно)")
 ax.plot(xs, corner_hi, ":", color="gray", lw=2)
-ax.set_xlabel("Days"); ax.set_ylabel("Reaction (ms)"); ax.legend()
-ax.set_title("Population line: correct pointwise CI vs the corner-plugging shortcut")
-plt.tight_layout(); plt.show()
+ax.legend(loc="best")
+plt.show()
 """
 )
 
 md(
-    """### What to Watch For
-The dotted "corner" band is visibly wider than the correct band — and conceptually it answers no well-defined question. Two honest limitations remain even in the correct band: it conditions on the estimated variance components (their uncertainty is ignored), and it is a band for the **population mean** $\\beta_0 + \\beta_1 x$, not for a new subject's trajectory. The Bayesian version later today will hand you the full posterior of both automatically.
+    """#### Модель со случайным смещением и наклоном
+
+Модель стала лучше, но на остатках всё ещё видна проблема: у части испытуемых остатки систематически меняются с днями — скорость нарастания времени реакции у каждого своя. Добавим случайный наклон:
+
+$$Reaction_{ij} = \\beta_0 + \\beta_1 Days_{ij} + b_i + c_{i} Days_{ij} + \\varepsilon_{ij},$$
+
+где
+
+$$b_i \\sim N(0, \\sigma_b^2), \\qquad c_i \\sim N(0, \\sigma_c^2), \\qquad \\varepsilon_{ij} \\sim N(0, \\sigma^2).$$
+
+В R модель записывается так:
+```R
+mod2 = lmer(Reaction ~ Days + (1 + Days | Subject), data = data)
+```
+
+В statsmodels другой синтаксис: случайные наклоны добавляются через `re_formula`. При этом сохраняются все правила формирования формул.
 """,
-    """### На что обратить внимание
-Пунктирный «угловой» коридор заметно шире корректного — и концептуально он не отвечает ни на один корректно поставленный вопрос. Даже в корректном коридоре остаются два честных ограничения: он условен на оценённые компоненты дисперсии (их неопределённость игнорируется), и это коридор для **популяционного среднего** $\\beta_0 + \\beta_1 x$, а не для траектории нового испытуемого. Байесовская версия ниже выдаст полную апостериорную неопределённость для обоих случаев автоматически.
+    """#### Random intercept and random slope
+
+The model has improved, but the residuals still show a problem: for some subjects the residuals trend systematically with days — each person has their own rate of slowing. Let us add a random slope:
+
+$$Reaction_{ij} = \\beta_0 + \\beta_1 Days_{ij} + b_i + c_{i} Days_{ij} + \\varepsilon_{ij},$$
+
+where
+
+$$b_i \\sim N(0, \\sigma_b^2), \\qquad c_i \\sim N(0, \\sigma_c^2), \\qquad \\varepsilon_{ij} \\sim N(0, \\sigma^2).$$
+
+In R the model is written as
+```R
+mod2 = lmer(Reaction ~ Days + (1 + Days | Subject), data = data)
+```
+
+In statsmodels the syntax is different: random slopes are added via `re_formula`. All the usual formula conventions still apply.
 """,
 )
 
-# ---------------------------------------------------------------------------
-# Section 5: Bambi + PSIS-LOO
-# ---------------------------------------------------------------------------
+code(
+    """lm_mixed = smf.mixedlm("Reaction ~ Days", data, groups=data["Subject"], re_formula="~ Days").fit()
+print(lm_mixed.summary())
+"""
+)
+
+code(
+    """print("Теперь у каждого испытуемого два параметра: собственный сдвиг и собственная чувствительность к дням недосыпа")
+
+re = pd.DataFrame(lm_mixed.random_effects)
+display(re)
+re.T.plot(kind='bar');
+"""
+)
+
 md(
-    """## 5. The Bayesian Counterpart in Bambi, Compared with PSIS-LOO
+    """Когда случайных эффектов несколько, возникает вопрос об их связи: если смещение и наклон коррелируют, нужно моделировать ковариацию между ними. Стандартная смешанная модель задаёт для пары $(b_i, c_i)$ двумерное нормальное распределение с корреляцией $\\rho$.
 
-### The Idea
-The same two models — random intercept, then random intercept **and** slope — written in the `lme4`-style formula language of [Bambi](https://bambinos.github.io/bambi/). Differences from the classical fit:
-- variance components and $\\rho$ get **full posterior distributions** instead of point estimates without standard errors;
-- Bambi places weakly informative default priors on all parameters; internally it builds the non-centered parameterization you met in the main Lesson 9 workbook (no funnel); its `(x | g)` terms fit *independent* group effects — see the subtlety below;
-- model choice follows the course convention: **PSIS-LOO** out-of-sample predictive accuracy via `az.compare` and `az.loo` (WAIC was its close relative in older ArviZ versions; ArviZ 1.x maintains PSIS-LOO).
-
-### Example
+Стоит уточнить распространённое заблуждение: statsmodels с `re_formula="~ Days"` **оценивает** полную ковариационную матрицу случайных эффектов — в summary она видна как `Group x Days Cov`. То есть корреляцию $\\rho$ statsmodels оценивает так же, как `lme4` с формулой `(1 + Days | Subject)`. Ограничение другое: statsmodels не сообщает стандартную ошибку или доверительный интервал для $\\rho$ и других компонент дисперсии.
 """,
-    """## 5. Байесовский двойник в Bambi и сравнение по PSIS-LOO
+    """With several random effects, the question of their association arises: if the intercept shift and the slope correlate, the covariance between them has to be modeled. The standard mixed model gives the pair $(b_i, c_i)$ a bivariate normal distribution with correlation $\\rho$.
 
-### Идея
-Те же две модели — случайный интерсепт, затем случайный интерсепт **и** наклон — записанные на языке формул в стиле `lme4` с помощью [Bambi](https://bambinos.github.io/bambi/). Отличия от классической подгонки:
-- компоненты дисперсии и $\\rho$ получают **полные апостериорные распределения** вместо точечных оценок без стандартных ошибок;
-- Bambi ставит слабоинформативные априорные распределения на все параметры; внутри строится безцентровая параметризация из основной тетради занятия 9 (без воронки); термины `(x | g)` строят *независимые* групповые эффекты — см. тонкость ниже;
-- выбор модели следует конвенции курса: вневыборочная предсказательная точность **PSIS-LOO** через `az.compare` и `az.loo` (WAIC — её близкая родственница в старых версиях ArviZ; ArviZ 1.x поддерживает PSIS-LOO).
+A common misconception is worth clarifying: statsmodels with `re_formula="~ Days"` **does estimate** the full random-effects covariance matrix — in the summary it appears as `Group x Days Cov`. That is, statsmodels estimates the correlation $\\rho$ just as `lme4` does with the formula `(1 + Days | Subject)`. The limitation lies elsewhere: statsmodels provides no standard error or confidence interval for $\\rho$ or for the other variance components.
+""",
+)
 
-### Пример
+code(
+    """# Корреляция случайных эффектов из модели (а не из диаграммы рассеяния BLUP)
+cov_re = lm_mixed.cov_re
+print("Оценённая ковариационная матрица случайных эффектов:")
+print(cov_re.round(2))
+
+corr_model = cov_re.iloc[0, 1] / np.sqrt(cov_re.iloc[0, 0] * cov_re.iloc[1, 1])
+print(f"\\nМодельная оценка корреляции rho = {corr_model:.3f} (без стандартной ошибки)")
+print(f"Выборочная корреляция BLUP-оценок (для сравнения) = {re.T['Group'].corr(re.T['Days']):.3f}")
+print("BLUP — это условные моды, а не оценки параметров; их выборочная корреляция смешивает сжатие с истинной rho.")
+"""
+)
+
+code(
+    """display(pg.corr(re.T['Group'], re.T['Days']))
+sns.scatterplot(x='Group', y = 'Days', data=re.T)
+plt.show()
+"""
+)
+
+code(
+    """print("Хоть и видно отклонение от нормальности, но только за счёт нескольких выбросов, а в остальном остатки сильно лучше")
+fig, axs = plt.subplots(1, 3, figsize = (10, 3))
+axs[0].hist(lm_mixed.resid)
+qqplot(lm_mixed.resid, line="s", ax=axs[1], markersize=3)
+axs[2].scatter(range(len(lm_mixed.resid)), lm_mixed.resid, s=8)
+plt.show()
+pg.normality(lm_mixed.resid)
+"""
+)
+
+code(
+    """print("Посмотрим, как устроены остатки модели по дням и субъектам: теперь всё сильно лучше")
+data['resids'] = lm_mixed.resid
+fig, axs = plt.subplots(1, 2, figsize = (10, 3))
+sns.boxplot(x = 'Days', y = 'resids', data=data, ax=axs[0])
+sns.boxplot(x = 'Subject', y = 'resids', data=data, ax=axs[1])
+axs[1].tick_params(axis="x", labelrotation=90)
+plt.show()
+"""
+)
+
+code(
+    """print("Доверительный коридор изменился, в том числе по дням — это важно для выводов")
+mean, lo, hi = fixed_effect_ci_band(lm_mixed, xs)
+corner_lo = conf_ints.loc['Intercept', 0] + conf_ints.loc['Days', 0] * xs
+corner_hi = conf_ints.loc['Intercept', 1] + conf_ints.loc['Days', 1] * xs
+
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.scatter(data.Days, data.Reaction, color="C0", ec="black", alpha=0.35, s=18, label="data")
+ax.plot(xs, mean, "r-", label="FixedMean")
+ax.fill_between(xs, lo, hi, color="C3", alpha=0.3, label="корректный 95% коридор")
+ax.plot(xs, corner_lo, ":", color="gray", lw=2, label="«угловой» коридор (некорректно)")
+ax.plot(xs, corner_hi, ":", color="gray", lw=2)
+ax.legend(loc="best")
+plt.show()
+"""
+)
+
+md(
+    """## Как тестировать гипотезы и выбирать модели?
+
+- Про выбор моделей — это критерии, основанные на правдоподобии (само правдоподобие, AIC, BIC).
+- Наличие эффекта — хочется иметь доверительный интервал и t-статистику, и с этим есть проблемы: получить их для смешанных моделей можно, но оценки приближённые. В пакете `lme4`, чтобы не вводить в заблуждение, уровни значимости даже не приводятся.
+
+Что делать? Есть параметрический бутстреп.
+
+Еще можно использовать байесовские модели: там задача ставится иначе (Монте-Карло или вариационный вывод), и на выходе получаются апостериорные распределения на параметры.
+""",
+    """## How to test hypotheses and choose models?
+
+- For model choice, these are likelihood-based criteria (the likelihood itself, AIC, BIC).
+- For the presence of an effect, one wants a confidence interval and a t-statistic — and here there are problems: they can be obtained for mixed models, but the approximations are rough. To avoid misleading users, the `lme4` package does not report significance levels at all.
+
+What can be done? There is the parametric bootstrap.
+
+One can also use Bayesian models: there the task is posed differently (Monte Carlo or variational inference), and the output consists of posterior distributions over the parameters.
+""",
+)
+
+md(
+    """## Байесовская иерархическая модель
+
+Теория — вне рамок курса; если интересно, см. Richard McElreath (https://xcelab.net/rm/statistical-rethinking/): у него есть лекции, книга, видео. Мы сейчас посмотрим только на то, как это делается на практике.
+
+Благодаря появлению пакета https://bambinos.github.io/bambi/ строить такие модели стало очень просто. Работает та же история с формулами, и синтаксис очень похож на используемый в `lme4`.
+
+Основная идея: все параметры — и фиксированные эффекты, и дисперсии случайных эффектов — получают априорные распределения, а в результате сэмплирования мы получаем апостериорные распределения для каждого из них.
+
+Один нюанс, о котором стоит знать: в Bambi групповые эффекты в формуле вида `(Days | Subject)` по умолчанию считаются **независимыми** — их корреляция не оценивается (в отличие от `lme4` и от смешанной модели statsmodels выше). Для этих данных это не критично: мы уже видели, что модельная оценка корреляции мала (ρ ≈ 0.07). Если корреляция сама по себе — предмет исследования, модель с корреляцией пишут вручную в PyMC.
+""",
+    """## Bayesian hierarchical model
+
+The theory is outside the scope of the course; if you are curious, see Richard McElreath (https://xcelab.net/rm/statistical-rethinking/): he has lectures, a book, videos. Here we only look at how it is done in practice.
+
+Thanks to the https://bambinos.github.io/bambi/ package, building such models has become very easy. Formulas work the same way, and the syntax closely resembles `lme4`.
+
+The main idea: all parameters — fixed effects and the variances of random effects alike — receive prior distributions, and sampling yields a posterior distribution for each of them.
+
+One caveat worth knowing: in Bambi, group effects in a formula like `(Days | Subject)` are by default **independent** — their correlation is not estimated (unlike `lme4` and unlike the statsmodels mixed model above). For these data this is not critical: we have already seen that the model estimate of the correlation is small (ρ ≈ 0.07). If the correlation itself is the object of study, the correlated model is written by hand in PyMC.
 """,
 )
 
 code(
     """model1 = bmb.Model("Reaction ~ 1 + Days + (1 | Subject)", data, categorical="Subject")
-print(model1)
-idata1 = model1.fit(draws=1000, tune=2000, chains=4, random_seed=RANDOM_SEED,
+model1
+"""
+)
+
+code(
+    """idata1 = model1.fit(draws=1000, tune=1000, chains=4, random_seed=RANDOM_SEED,
                     idata_kwargs={"log_likelihood": True})
-print(az.summary(idata1, var_names=["Intercept", "Days", "1|Subject_sigma", "sigma"],
-                 round_to=2))
-print("\\nPSIS-LOO (ELPD scale):", az.loo(idata1).elpd.round(1))
-print("(The legacy notebook printed WAIC; ArviZ 1.x maintains PSIS-LOO as its criterion.)")
+"""
+)
+
+code(
+    """az.summary(idata1)
+"""
+)
+
+code(
+    """# Прежняя версия тетради печатала здесь WAIC; в актуальном ArviZ остался критерий PSIS-LOO
+print(az.loo(idata1))
 """
 )
 
 code(
     """model2 = bmb.Model("Reaction ~ 1 + Days + (Days | Subject)", data, categorical="Subject")
-print(model2)
-idata2 = model2.fit(draws=1000, tune=2000, chains=4, random_seed=RANDOM_SEED,
-                    idata_kwargs={"log_likelihood": True})
-print(az.summary(idata2, var_names=["Intercept", "Days", "1|Subject_sigma",
-                                    "Days|Subject_sigma", "sigma"],
-                 round_to=2))
-print("\\nPSIS-LOO (ELPD scale):", az.loo(idata2).elpd.round(1))
+model2
 """
 )
 
 code(
-    """# PSIS-LOO model comparison (course convention)
-cmp_df = az.compare({"RI: (1|Subject)": idata1, "RIS: (Days|Subject)": idata2})
-print(cmp_df.round(1))
-az.plot_compare(cmp_df)
+    """idata2 = model2.fit(draws=1000, tune=1000, chains=4, random_seed=RANDOM_SEED,
+                    idata_kwargs={"log_likelihood": True})
+"""
+)
+
+code(
+    """print(az.loo(idata2))
+"""
+)
+
+code(
+    """models_dict = {
+    "model1": idata1,
+    "model2": idata2
+}
+df_compare = az.compare(models_dict)
+df_compare
+"""
+)
+
+code(
+    """az.plot_compare(df_compare)
 plt.show()
 """
 )
 
-md(
-    """### What to Watch For
-1. **Trust checks before interpretation.** Check `r_hat` ($\\le 1.01$) and ESS in the summaries above before believing anything. If a notebook you read skips this step, distrust its numbers.
-2. The RIS model `(Days | Subject)` wins the LOO comparison: individual slopes carry real predictive information — exactly what the subject panels suggested.
-2b. ArviZ printed warnings like `Estimated shape parameter ... greater than 0.70`: in hierarchical models each observation carries the influence of its cluster's group parameters, so PSIS importance sampling often flags $\\hat k > 0.7$ even for a healthy model. Treat these flags as a signal to double-check (or to use leave-one-*cluster*-out cross-validation), not as an automatic verdict of failure.
-3. Now look at what the classical fit could not give you: a full posterior for $\\sigma_{\\text{intercept}}$ and $\\sigma_{\\text{slope}}$. The forest plots below show per-subject intercepts and slopes *with* uncertainty — compare them with the lonely BLUP points of Section 3.
+code(
+    """#проверка коррелированности параметров
+_, ax = plt.subplots()
 
-*(The legacy notebook compared the two models with WAIC; here we print PSIS-LOO — the criterion maintained by ArviZ 1.x and adopted throughout this course.)*
-
-One structural subtlety: **Bambi's `(Days | Subject)` fits independent varying intercepts and slopes — it does not estimate their correlation** (unlike `lme4`'s `(1 + Days | Subject)`, and unlike the `MixedLM` of Section 3 with its `Group x Days Cov`). The cell below quantifies how much that simplification matters here.
-""",
-    """### На что обратить внимание
-1. **Проверки доверия прежде интерпретаций.** Перед тем как верить числам, проверьте `r_hat` ($\\le 1{,}01$) и ESS в сводках выше. Если тетрадь пропускает этот шаг — не доверяйте её числам.
-2. Модель со случайным наклоном `(Days | Subject)` выигрывает по LOO: индивидуальные наклоны несут реальную предсказательную информацию — ровно то, что предполагали панели испытуемых.
-2b. ArviZ напечатал предупреждения вида `Estimated shape parameter ... greater than 0.70`: в иерархических моделях каждое наблюдение несёт влияние групповых параметров своего кластера, поэтому PSIS-выборка часто помечает $\\hat k > 0.7$ даже у здоровой модели. Относитесь к этим флагам как к повод перепроверить (или перейти к кросс-валидации с исключением целого кластера), а не как к автоматическому приговору.
-3. Теперь посмотрите, чего не мог дать классический фит: полное апостериорное распределение для $\\sigma_{\\text{интерсепт}}$ и $\\sigma_{\\text{наклон}}$. Графики-«лес» ниже показывают интерсепты и наклоны по испытуемым *вместе с* неопределённостью — сравните с одинокими точками BLUP из раздела 3.
-
-*(Прежняя учебная тетрадь сравнивала модели по WAIC; здесь мы печатаем PSIS-LOO — поддерживаемый в ArviZ 1.x критерий, принятый в этом курсе.)*
-
-Один структурный тонкий момент: **Bambi в формуле `(Days | Subject)` строит независимые случайные интерсепты и наклоны — их корреляция не оценивается** (в отличие от `lme4` с `(1 + Days | Subject)` и от `MixedLM` из раздела 3 с его `Group x Days Cov`). Ячейка ниже показывает, насколько это упрощение здесь существенно.
-""",
+post_ds = idata2.posterior.to_dataset()
+post_ds.plot.scatter(
+    x="1|Subject", y="Days|Subject",
+    hue="Subject__factor_dim",
+    add_colorbar=False,
+    add_legend=False,
+    cmap="tab20",
+    s=4, alpha=0.15,
+)
+ax.set_xlabel("апостериорный сдвиг интерсепта (мс)")
+ax.set_ylabel("апостериорный сдвиг наклона (мс/день)")
+plt.show()
+"""
 )
 
 code(
-    """# Posterior of the variance components — the classical fit gave single numbers only
-post_ds = idata2.posterior.to_dataset()
-fig, axs = plt.subplots(1, 2, figsize=(10, 3.5))
-for ax, vname, classical in zip(
-        axs, ["1|Subject_sigma", "Days|Subject_sigma"],
-        [np.sqrt(cov_re.iloc[0, 0]), np.sqrt(cov_re.iloc[1, 1])]):
-    draws = post_ds[vname].values.flatten()
-    ax.hist(draws, bins=40, color="C0", alpha=0.75, edgecolor="white", density=True)
-    lo, hi = az.hdi(draws)
-    ax.axvline(lo, color="C3", ls="--", label=f"94% HDI [{lo:.1f}, {hi:.1f}]")
-    ax.axvline(hi, color="C3", ls="--")
-    ax.axvline(classical, color="black", lw=2, label=f"classical point {classical:.1f}")
-    ax.set_title(vname)
-    ax.legend(fontsize=8)
-plt.tight_layout(); plt.show()
-
-print(f"Classical point estimates: sigma_intercept = {np.sqrt(cov_re.iloc[0,0]):.1f} ms, "
-      f"sigma_slope = {np.sqrt(cov_re.iloc[1,1]):.1f} ms/day, rho = {corr_model:.3f}")
-
-# Bambi fits independent group effects: quantify the realized correlation per draw.
-# (With 18 subjects this realized statistic is a noisy proxy for the population rho,
-#  but its spread shows the orders of magnitude compatible with the data.)
+    """# Апостериорные интерсепты и наклоны каждого испытуемого с 94% интервалами
+subjects = list(data["Subject"].unique())
 b_draws = post_ds["1|Subject"].values.reshape(-1, len(subjects))
 c_draws = post_ds["Days|Subject"].values.reshape(-1, len(subjects))
-realized_corr = np.array([np.corrcoef(b_draws[k], c_draws[k])[0, 1] for k in range(b_draws.shape[0])])
-print(f"Per-draw realized corr(intercept, slope): mean = {realized_corr.mean():.3f}, "
-      f"SD = {realized_corr.std():.3f}")
 
-# Bivariate posterior cloud of subject effects (one dot = one posterior draw of one subject)
-_, ax = plt.subplots(figsize=(5.5, 4.5))
-post_ds.plot.scatter(x="1|Subject", y="Days|Subject",
-                     hue="Subject__factor_dim", add_colorbar=False,
-                     add_legend=False, cmap="tab20", s=4, alpha=0.15, ax=ax)
-ax.set_xlabel("posterior intercept deviation (ms)")
-ax.set_ylabel("posterior slope deviation (ms/day)")
-ax.set_title("Joint posterior of subject effects (RIS model)")
-plt.show()
-
-# Forest plots with uncertainty — compare with BLUP bars in Section 3
-def forest_plot(ax, draws_2d, labels, xlabel):
-    # Per-subject HDI line + posterior mean dot (draws_2d: draws x subjects)
-    order = np.argsort(draws_2d.mean(axis=0))
+def forest(ax, draws, xlabel):
+    order = np.argsort(draws.mean(axis=0))
     for pos, idx in enumerate(order):
-        lo, hi = az.hdi(draws_2d[:, idx])
-        mean = draws_2d[:, idx].mean()
+        lo, hi = az.hdi(draws[:, idx])
         ax.hlines(pos, lo, hi, color="C0", lw=2, alpha=0.8)
-        ax.plot(mean, pos, "o", color="C3", ms=4)
+        ax.plot(draws[:, idx].mean(), pos, "o", color="C3", ms=4)
     ax.set_yticks(range(len(order)))
-    ax.set_yticklabels([str(labels[i]) for i in order], fontsize=7)
+    ax.set_yticklabels([str(subjects[i]) for i in order], fontsize=7)
     ax.set_xlabel(xlabel)
 
-fig, axs = plt.subplots(1, 2, figsize=(11, 6))
-forest_plot(axs[0], b_draws, subjects, "posterior intercept deviation (ms)")
-axs[0].set_title("Posterior subject intercepts (94% HDI)")
-forest_plot(axs[1], c_draws, subjects, "posterior slope deviation (ms/day)")
-axs[1].set_title("Posterior subject slopes (94% HDI)")
-plt.tight_layout(); plt.show()
+fig, axs = plt.subplots(1, 2, figsize = (10, 6))
+forest(axs[0], b_draws, "сдвиг интерсепта (мс)")
+axs[0].set_title("Интерсепт каждого испытуемого")
+forest(axs[1], c_draws, "сдвиг наклона (мс/день)")
+axs[1].set_title("Наклон по дням каждого испытуемого")
+plt.tight_layout()
+plt.show()
 """
 )
 
 md(
-    """### What to Watch For
-The posterior scatter is a *cloud per subject*, not a point: each subject's $(b_i, c_i)$ carries uncertainty — this is the practical meaning of "hierarchical Bayes propagates uncertainty". The posterior of $\\sigma_{\\text{slope}}$ replaces the single classical number and silently adds the uncertainty the classical fit could not report. The realized per-draw correlation (around $0$) is consistent with the small classical $\\hat\\rho \\approx 0.07$: for this dataset the independence simplification costs little. If your research question targets $\\rho$ itself, build the correlated model by hand in PyMC (an LKJ prior on the Cholesky factor of the $2\\times2$ covariance) — Bambi's formula interface will not do it for you.
+    """Обратите внимание на разницу с классической моделью: у каждого испытуемого теперь не точечная оценка (BLUP), а целое апостериорное распределение — со своей неопределённостью. То же самое верно для стандартных отклонений случайных эффектов: классический метод даёт одно число без интервала, байесовский — распределение.
 
-**Where classical and Bayesian worlds agree:** the fixed effects here ($\\beta_0 \\approx 251$, $\\beta_1 \\approx 10.5$ ms/day) match the MixedLM estimates closely, and both match `lme4`. The paradigms differ in what they say *about* the numbers: a point with an approximate SE versus a full joint posterior.
+# Домашнее задание
+Постройте смешанную модель для данных по росту свиней. Эти данные и результаты можно найти во всех пакетах: https://www.rdocumentation.org/packages/doBy/versions/4.6-2/topics/data-dietox. Но в тьюториалах рассматривается только зависимость от времени, а вы посмотрите и остальные переменные, потестируйте разные модели.
+
+Описание данных:
+
+This data frame contains the following columns:
+
+- Weight: Weight
+- Feed: Cumulated feed intake
+- Time: Time (in weeks) in the experiment
+- Pig: Id of each pig
+- Evit: Vitamin E dose
+- Cu: Copper dose
+- Start: Start weight in experiment, i.e. weight at week 1
+- Litter: Id of litter of each pig
+
+Details: Data contains weight of slaughter pigs measured weekly for 12 weeks. Data also contains the start weight (i.e. the weight at week 1). The treatments are 3 different levels of Evit = vitamin E (dose: 0, 100, 200 mg dl-alpha-tocopheryl acetat /kg feed) in combination with 3 different levels of Cu = copper (dose: 0, 35, 175 mg/kg feed) in the feed. The cumulated feed intake is also recorded. The pigs are littermates.
 """,
-    """### На что обратить внимание
-Апостериорное рассеяние — это *облако на каждого испытуемого*, а не точка: $(b_i, c_i)$ каждого участника несёт неопределённость — в этом практический смысл слов «иерархический Байес распространяет неопределённость». Апостериорное распределение $\\sigma_{\\text{наклон}}$ заменяет одиночное классическое число и молча добавляет ту неопределённость, которую классический фит сообщить не мог. Реализованная корреляция на дров (около $0$) согласуется с малым классическим $\\hat\\rho \\approx 0{,}07$: для этих данных упрощение независимости почти ничего не стоит. Если же исследовательский вопрос направлен именно на $\\rho$, стройте коррелированную модель вручную в PyMC (LKJ-приор на фактор Холецкого ковариации $2\\times2$) — формульный интерфейс Bambi этого не сделает.
+    """Note the difference from the classical model: each subject now has not a point estimate (a BLUP) but a full posterior distribution — with its own uncertainty. The same holds for the standard deviations of the random effects: the classical method gives one number without an interval, the Bayesian one gives a distribution.
 
-**Где классический и байесовский миры согласны:** фиксированные эффекты здесь ($\\beta_0 \\approx 251$, $\\beta_1 \\approx 10{,}5$ мс/день) близки к оценкам MixedLM, и обе стороны совпадают с `lme4`. Парадигмы различаются тем, что они говорят *о* числах: точка с приближённой SE против полного совместного апостериорного распределения.
-""",
-)
+# Homework
+Build a mixed model for the pig growth data. These data and results can be found in most packages: https://www.rdocumentation.org/packages/doBy/versions/4.6-2/topics/data-dietox. Tutorials only consider the dependence on time, but you should also look at the other variables and try different models.
 
-# ---------------------------------------------------------------------------
-# Section 6: optional homework
-# ---------------------------------------------------------------------------
-md(
-    """## 6. Optional Homework: Growth of Slaughter Pigs (`dietox`)
+Data description:
 
-The legacy course notebook ended with this dataset, and it remains a perfect exercise. The `dietox` data (R package `geepack`) contains the weight of slaughter pigs measured weekly for 12 weeks. The treatments are 3 levels of vitamin E (`Evit`: 0, 100, 200 mg/kg feed) combined with 3 levels of copper (`Cu`: 0, 35, 175 mg/kg feed); cumulated feed intake (`Feed`) is also recorded; pigs are littermates (`Litter`).
+This data frame contains the following columns:
 
-**Tasks** (the legacy homework said: "test different models, look beyond time"):
-1. Load the data from the book repository (cell below) and explore it: how many pigs, how many weeks, balanced or not?
-2. Fit a classical random-intercept model `Weight ~ Time + (1 | Pig)`, then a random-intercept-and-slope model `Weight ~ Time + (Time | Pig)`. Compare them (LOO on the Bambi versions, or AIC on the classical fits — and note which comparison you can defend).
-3. Add `Evit`, `Cu` and their interaction as fixed effects. Do the supplements change the *growth rate* or only the *baseline*? Formulate the model that answers each question.
-4. Add `(1 | Litter)` — crossed random effects (pigs nested in litters, observations nested in pigs). What happens to the pig-level variance?
-5. Report everything on the observable scale (kg per week) with uncertainty, following the course protocol.
-""",
-    """## 6. Необязательное домашнее задание: рост свиней (`dietox`)
+- Weight: Weight
+- Feed: Cumulated feed intake
+- Time: Time (in weeks) in the experiment
+- Pig: Id of each pig
+- Evit: Vitamin E dose
+- Cu: Copper dose
+- Start: Start weight in experiment, i.e. weight at week 1
+- Litter: Id of litter of each pig
 
-Прежняя учебная тетрадь завершалась этим датасетом, и он остаётся идеальным упражнением. Данные `dietox` (R-пакет `geepack`) содержат вес убойных свиней, измеряемый еженедельно на протяжении 12 недель. Обработки — 3 уровня витамина E (`Evit`: 0, 100, 200 мг/кг корма) в комбинации с 3 уровнями меди (`Cu`: 0, 35, 175 мг/кг корма); накопленное потребление корма (`Feed`) также записано; свиньи — одноклассники по помёту (`Litter`).
-
-**Задания** (в прежнем ДЗ говорилось: «протестируйте разные модели, посмотрите и остальные переменные»):
-1. Загрузите данные из репозитория книги (ячейка ниже) и изучите их: сколько свиней, сколько недель, сбалансировано или нет?
-2. Подгоните классическую модель со случайным интерсептом `Weight ~ Time + (1 | Pig)`, затем со случайным интерсептом и наклоном `Weight ~ Time + (Time | Pig)`. Сравните их (LOO на Bambi-версиях или AIC на классических фитах — и отметьте, какое сравнение вы можете защитить).
-3. Добавьте `Evit`, `Cu` и их взаимодействие как фиксированные эффекты. Меняют ли добавки *скорость роста* или только *базовый уровень*? Сформулируйте модель, отвечающую на каждый из вопросов.
-4. Добавьте `(1 | Litter)` — пересекающиеся случайные эффекты (свиньи вложены в помёты, наблюдения — в свиней). Что происходит с дисперсией на уровне свиней?
-5. Отчитайтесь обо всём на наблюдаемой шкале (кг в неделю) с неопределённостью, следуя протоколу курса.
+Details: Data contains weight of slaughter pigs measured weekly for 12 weeks. Data also contains the start weight (i.e. the weight at week 1). The treatments are 3 different levels of Evit = vitamin E (dose: 0, 100, 200 mg dl-alpha-tocopheryl acetat /kg feed) in combination with 3 different levels of Cu = copper (dose: 0, 35, 175 mg/kg feed) in the feed. The cumulated feed intake is also recorded. The pigs are littermates.
 """,
 )
 
 code(
-    """# Homework data starter (no solutions below — this one is yours to build)
-PIGS_URL = "https://raw.githubusercontent.com/iknyazeva/bayes-cogsci-book/main/data/dietox.csv"
+    """# Данные dietox — каноническая копия в репозитории курса
 PIGS_PATH = "data/dietox.csv"
 if not os.path.exists(PIGS_PATH):
-    import urllib.request
-    urllib.request.urlretrieve(PIGS_URL, PIGS_PATH)
-
-pigs = pd.read_csv(PIGS_PATH)
-pigs = pigs.drop(columns=["rownames"])
-pigs["Pig"] = pigs["Pig"].astype("category")
-pigs["Litter"] = pigs["Litter"].astype("category")
-print(pigs.head())
-print("pigs:", pigs["Pig"].nunique(), "| rows:", len(pigs), "| weeks:", sorted(pigs["Time"].unique()))
+    url_p = "https://raw.githubusercontent.com/iknyazeva/bayes-cogsci-book/main/data/dietox.csv"
+    urllib.request.urlretrieve(url_p, PIGS_PATH)
+data_pigs = pd.read_csv(PIGS_PATH)
 """
 )
 
-md(
-    """## Summary
-
-- Repeated measures create within-cluster correlation; ignoring it (pooled OLS) produces overconfident standard errors, visible in Durbin–Watson $\\approx 0.7$.
-- Subject dummies fix intercepts but overfit, cannot generalize, and force a common slope.
-- Mixed models estimate population-level fixed effects *and* variance components — including, in `statsmodels`, the intercept–slope covariance. Their blind spot is uncertainty for variance components and correlations (BLUPs without standard errors, no CI for $\\rho$).
-- Bambi delivers the same models as full posteriors, with non-centered internals and weakly informative priors; PSIS-LOO decides between random-intercept and random-slope structures on predictive grounds. Note the formula `(x | g)` fits independent group effects; the intercept–slope correlation is only available in the hand-written PyMC/`lme4` worlds.
-- Reference literature: Douglas Bates et al., *lme4*; Belenky et al. (2003), *Journal of Sleep Research*; McElreath, *Statistical Rethinking*, Chapter 13–14.
-
-**Back to the book:** the main Lesson 9 workbook builds the same hierarchy by hand in PyMC; the page *Mixed Models vs. Hierarchical Bayes* condenses this ladder; Lesson 10's workbook adds binary outcomes.
-""",
-    """## Итоги
-
-- Повторные измерения создают внутрикластерную корреляцию; её игнорирование (объединённый OLS) даёт избыточно самоуверенные стандартные ошибки, что видно по Дарбину–Уотсону $\\approx 0{,}7$.
-- Дамми испытуемых чинят интерсепты, но переобучаются, не обобщаются и навязывают общий наклон.
-- Смешанные модели оценивают фиксированные эффекты популяции *и* компоненты дисперсии — включая, в `statsmodels`, ковариацию интерсепт–наклон. Их слепое пятно — неопределённость компонент дисперсии и корреляций (BLUP без стандартных ошибок, нет CI для $\\rho$).
-- Bambi выдаёт те же модели полными апостериорными распределениями, с безцентровой внутренностью и слабоинформативными приорами; PSIS-LOO решает выбор между структурами со случайным интерсептом и наклоном по предсказательным основаниям. Помните: формула `(x | g)` строит независимые групповые эффекты; корреляция интерсепт–наклон доступна только в мирах PyMC-вручную и `lme4`.
-- Литература: Douglas Bates et al., *lme4*; Belenky et al. (2003), *Journal of Sleep Research*; McElreath, *Statistical Rethinking*, главы 13–14.
-
-**Назад к книге:** основная тетрадь занятия 9 строит ту же иерархию вручную в PyMC; страница «Классические смешанные модели и байесовская иерархия» сжимает эту лестницу; тетрадь занятия 10 добавляет бинарные исходы.
-""",
+code(
+    """data_pigs.head()
+"""
 )
 
 
@@ -776,7 +815,7 @@ md(
 # Build
 # ---------------------------------------------------------------------------
 def build() -> None:
-    for lang in ["en", "ru"]:
+    for lang in ["ru", "en"]:
         nb = new_notebook()
         for cell_type, variants in CELLS:
             text = variants[lang]
