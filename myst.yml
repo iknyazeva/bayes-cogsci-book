@@ -161,7 +161,8 @@ project:
   static_files:
   - _static
 site:
-  template: book-theme
+  # Pinned to v1.4.1 (2026-09-21); v2.0.0 (2026-11-10) breaks multi-project /en & /ru builds
+  template: https://github.com/myst-templates/book-theme/archive/23f2df5493e23dfb1d9433c8aa64c87beb4232a3.zip
   projects:
     - slug: en
       path: .

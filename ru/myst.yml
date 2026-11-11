@@ -73,3 +73,7 @@ project:
         title: 'Дополнительно: порядковая логистическая регрессия'
       - file: 9.ExponentialData.md
         title: 'Дополнительно: длительности и времена ожидания'
+  - title: 'Часть VI. Разборы исследований (Case Studies)'
+    children:
+    - file: CaseStudies.Cryptomnesia.ipynb
+      title: 'Кейс B: Криптомнезия — атрибуция источника слов'

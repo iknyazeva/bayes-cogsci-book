@@ -1,6 +1,8 @@
 # Case Study: Cryptomnesia — Unconscious Plagiarism in a DRM Dialogue
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iknyazeva/bayes-cogsci-book/blob/main/case_studies/CaseStudies.Cryptomnesia.ipynb)
+*[Русская версия (интерактивная тетрадь)](/ru/casestudies-cryptomnesia)*
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iknyazeva/bayes-cogsci-book/blob/main/case_studies/CaseStudies.Cryptomnesia.ipynb) · [Russian notebook (Colab)](https://colab.research.google.com/github/iknyazeva/bayes-cogsci-book/blob/main/case_studies/cryptomnesia_ru.ipynb)
 
 *Hierarchical Bayesian logistic regression with three crossed random effects.*
 

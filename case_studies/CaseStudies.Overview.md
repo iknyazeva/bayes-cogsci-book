@@ -109,7 +109,7 @@ game × condition (94% intervals).*
 (case-b)=
 ## Case B: Cryptomnesia — Unconscious Plagiarism
 
-**Full chapter:** [Case B: Cryptomnesia — Unconscious Plagiarism](CaseStudies.Cryptomnesia.md)
+**Full chapter:** [Case B: Cryptomnesia — Unconscious Plagiarism](CaseStudies.Cryptomnesia.md) · [Русская тетрадь](/ru/casestudies-cryptomnesia) ([Colab](https://colab.research.google.com/github/iknyazeva/bayes-cogsci-book/blob/main/case_studies/cryptomnesia_ru.ipynb))
 *(Gershkovich lab: Popova 2017 diploma + 3 replications, N = 159, 8,350 trials)*
 
 **Problem.** Participants alternate reading words with a virtual partner ("Misha"), then judge each
