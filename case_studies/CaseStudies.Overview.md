@@ -57,7 +57,7 @@ this part were chosen because together they exercise the full craft:
 (case-a)=
 ## Case A: Testosterone & Risk-Taking
 
-**Full chapter:** [Case A: Testosterone, Risk-Taking & the Endowment Effect](CaseStudies.TestosteroneRiskEndowment.md)
+**Full chapter:** [Case A: Testosterone, Risk-Taking & the Endowment Effect](CaseStudies.TestosteroneRiskEndowment.md) · [Русская тетрадь](/ru/casestudies-testosteroneriskendowment) ([Colab](https://colab.research.google.com/github/iknyazeva/bayes-cogsci-book/blob/main/case_studies/risk_taking_testosterone_ru.ipynb))
 *(Votinov, Knyazeva, Habel, Konrad & Puiu, 2022, *Front. Neurosci.* 16:858168 — re-analyzed in PyMC 5)*
 
 **Problem.** Forty men performed a risk-taking task (risky gamble vs sure option, gain and loss

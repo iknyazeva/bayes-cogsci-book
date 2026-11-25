@@ -75,5 +75,7 @@ project:
         title: 'Дополнительно: длительности и времена ожидания'
   - title: 'Часть VI. Разборы исследований (Case Studies)'
     children:
+    - file: CaseStudies.TestosteroneRiskEndowment.ipynb
+      title: 'Кейс A: Тестостерон, принятие риска и теория перспектив'
     - file: CaseStudies.Cryptomnesia.ipynb
       title: 'Кейс B: Криптомнезия — атрибуция источника слов'

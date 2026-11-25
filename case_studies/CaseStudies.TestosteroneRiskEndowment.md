@@ -1,6 +1,8 @@
 # Case Study: Testosterone, Risk-Taking and the Endowment Effect
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iknyazeva/bayes-cogsci-book/blob/main/case_studies/CaseStudies.TestosteroneRiskEndowment.ipynb)
+*[Русская версия (интерактивная тетрадь)](/ru/casestudies-testosteroneriskendowment)*
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iknyazeva/bayes-cogsci-book/blob/main/case_studies/CaseStudies.TestosteroneRiskEndowment.ipynb) · [Russian notebook (Colab)](https://colab.research.google.com/github/iknyazeva/bayes-cogsci-book/blob/main/case_studies/risk_taking_testosterone_ru.ipynb)
 
 *A complete Bayesian re-analysis of a real published experiment, from raw data to counterfactual
 predictions, in modern PyMC.*
